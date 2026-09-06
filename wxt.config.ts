@@ -4,6 +4,9 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
+    // Display name for chrome://extensions; the npm package name is the
+    // lowercase slug and can't carry the accents.
+    name: 'Pokémon GO in Web',
     // Trainer profile (name, gender, start time) lives in chrome.storage.
     permissions: ['storage'],
     // Poké Ball toolbar/extension icon (30×30 source — Chrome scales it).
