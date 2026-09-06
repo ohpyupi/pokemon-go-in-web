@@ -4,6 +4,8 @@ Are you bored of just navigating the web? Imagine encountering a wild Pokémon w
 
 Wild **Gen-1 Pokémon** show up at the bottom of the pages you visit and wander around. Which Pokémon meets you on which site is **deterministic** — it depends on *you* (your trainer seed) and the *domain*.
 
+<img src="public/pokemon-go-in-web-screenshot.png" alt="A wild Pokémon wandering along the bottom of a web page" width="640">
+
 ## How it works
 
 **Registration (popup).** Click the Poké Ball toolbar icon to open the popup. First run asks for your trainer name, boy/girl, and captures the current time — the three fields form your **seed**, stored in `chrome.storage.local`. "New game" erases the trainer and lets you re-register.
@@ -19,28 +21,6 @@ So the same trainer visiting the same domain always meets the same Pokémon (hos
 **No dev territory.** `localhost` and IP addresses never host a Pokémon — dev and internal hosts stay safari-free. Browser-internal pages (`chrome://`, the Web Store…) can't be visited by the Pokémon at all, by platform design.
 
 **The sprite.** The Pokémon wanders along the bottom of the page — pausing now and then, strolling left or right at its own pace. Sprites are the classic animated Gen-1 icons, which naturally face left; they turn around when they walk right.
-
-## Project structure
-
-```
-entrypoints/
-  background.ts        encounter decision: reads profile, dexId = f(seed, hostname)
-  content/
-    index.ts           content-script entry: host blacklist, ask background, spawn
-    PokemonSprite.ts   the wandering sprite: DOM, phase machine, rAF loop
-    style.css          pkmgw-*-prefixed styles (host pages can't collide)
-  popup/
-    index.html, main.tsx, App.tsx, App.css, style.css
-                       registration + trainer card (pokéball red/white theme)
-public/
-  pokemon-icons/       1.png–151.png: Gen-1 animated sprites (PokéAPI)
-  poke-ball.png        Poké Ball — popup brand mark and toolbar/extension icon
-utils/
-  trainer.ts           TrainerProfile type + chrome.storage helpers
-  encounter.ts         dexIdFrom() and isBlockedHost()
-scripts/
-  download-icons.ts    one-shot sprite downloader (see below)
-```
 
 ## Development
 
