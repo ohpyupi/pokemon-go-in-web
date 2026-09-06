@@ -1,6 +1,6 @@
 {
   "name": "pokemon-go-in-web",
-  "description": "manifest.json description",
+  "description": "Unofficial fan-made game — the web is your Pokémon safari, where a wild Gen-1 Pokémon wanders the bottom of each page you visit.",
   "private": true,
   "version": "1.0.0",
   "type": "module",
