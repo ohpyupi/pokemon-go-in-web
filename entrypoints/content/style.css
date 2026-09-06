@@ -1,0 +1,31 @@
+/* Visuals for the wandering sprite injected by content/index.ts.
+ * All classes are pkmgw-* prefixed (pokemon-go-in-web) so host-page
+ * stylesheets can't collide. */
+
+/* Fixed-position root: JS moves it horizontally every frame (translate3d).
+ * inline-block so it shrink-wraps the sprite — otherwise the ground shadow's
+ * left: 50% would center on the whole viewport width. */
+.pkmgw-root {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 2147483000;
+  pointer-events: none; /* let clicks pass through to the page for now */
+  will-change: transform;
+  display: inline-block;
+}
+
+.pkmgw-img {
+  display: block; /* natural size: 32×32 */
+  transform-origin: center;
+}
+
+/* Icons are drawn facing left natively: walking left is unflipped,
+ * walking right mirrors the art. Toggled by JS from actual travel (dx). */
+.pkmgw-f-left {
+  transform: scaleX(1);
+}
+
+.pkmgw-f-right {
+  transform: scaleX(-1);
+}

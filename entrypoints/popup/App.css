@@ -1,42 +1,180 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* Popup screens (trainer registration + trainer card).
+ * Theme: classic Poké Ball red on white — a light, game-familiar look.
+ * Swap the tokens below to re-theme. */
+
+:root {
+  --red: #e3350d;
+  --red-ink: #ffffff; /* text/icon on red */
+  --text: #20252c;
+  --text-muted: #6b7280;
+  --line: #e3e5e9;
+  --input-bg: #ffffff;
+  --chip-bg: #f2f3f5;
+  --error: #d32f2f;
+}
+
+.screen {
+  box-sizing: border-box;
+  width: 340px;
+  padding: 1.25rem 1.5rem 1.5rem;
+  color: var(--text);
+  background: #ffffff;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #54bc4ae0);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin: 0 0 0.9rem;
+  color: var(--red);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.brand-ball {
+  width: 18px;
+  height: 18px;
 }
 
-.card {
-  padding: 2em;
+h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.6rem;
+  letter-spacing: 0.02em;
 }
 
-.read-the-docs {
-  color: #888;
+.field {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.field input {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+  text-align: center;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: var(--red);
+}
+
+.field input::placeholder {
+  color: #9aa0a8;
+}
+
+.field-label {
+  margin: 0.9rem 0 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.gender-options {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.gender-btn {
+  flex: 1;
+  padding: 0.5rem 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+}
+
+.gender-btn:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.gender-btn.selected {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--red-ink);
+}
+
+.error {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: var(--error);
+}
+
+.cta {
+  display: block;
+  width: 100%;
+  margin-top: 1.1rem;
+  padding: 0.7rem 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--red);
+  color: var(--red-ink);
+  font: inherit;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.cta:hover {
+  filter: brightness(0.94);
+}
+
+.cta:active {
+  transform: translateY(1px);
+}
+
+.gender-chip {
+  display: inline-block;
+  margin: 0.25rem 0 0.5rem;
+  padding: 0.15rem 0.7rem;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  font-size: 0.85rem;
+}
+
+.stamp {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.version {
+  margin: 1.1rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.reset {
+  margin-top: 1.1rem;
+  border: none;
+  background: none;
+  color: #9aa0a8;
+  font: inherit;
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.reset:hover {
+  color: var(--error);
 }

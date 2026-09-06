@@ -2,7 +2,7 @@
   "name": "wxt-react-starter",
   "description": "manifest.json description",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
@@ -16,6 +16,7 @@
     "build:pokemon-sprites-icon": "node scripts/download-icons.ts"
   },
   "dependencies": {
+    "is-ip": "^5.0.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
