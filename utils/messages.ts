@@ -8,6 +8,7 @@
  */
 
 import type { PokedexRow } from '@/model/pokedex';
+import type { Encounter } from '@/model/db';
 
 /** Messages the background listens for (sent up by content scripts and
  *  the popup — the popup reads model data through the controller). */
@@ -19,6 +20,12 @@ export type BackgroundMessage =
 export type ContentMessage =
   | { type: 'spawn' } // profile (re)created: re-resolve and spawn the sprite
   | { type: 'destroy' }; // profile erased: remove the sprite
+
+/** Messages the popup listens for (broadcast by the background while the
+ *  popup is open — a closed popup has no listener, which is fine). */
+export type PopupMessage =
+  | { type: 'pokedex-entry-added'; encounter: Encounter }; // a first
+// meeting: the popup merges the row in place instead of refetching
 
 /** Reply to get-encounter: a dexId, or null when there is no encounter here. */
 export type EncounterReply = { dexId: number | null };
@@ -34,6 +41,11 @@ export function isBackgroundMessage(message: unknown): message is BackgroundMess
 /** True when `message` is one a content script must handle. */
 export function isContentMessage(message: unknown): message is ContentMessage {
   return isOneOf(message, 'spawn', 'destroy');
+}
+
+/** True when `message` is one the popup must handle. */
+export function isPopupMessage(message: unknown): message is PopupMessage {
+  return isOneOf(message, 'pokedex-entry-added');
 }
 
 function isOneOf(message: unknown, ...types: readonly string[]): boolean {
