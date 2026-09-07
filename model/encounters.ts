@@ -14,12 +14,17 @@ export class EncountersRepository {
 
   /** Record a meeting. The first meeting wins: dexId is the table's key,
    *  and `add` rejects when a row already exists — a later sighting of the
-   *  same species must not overwrite when/where it first appeared. */
-  async markSeen(dexId: number, seenOn: string): Promise<void> {
+   *  same species must not overwrite when/where it first appeared.
+   *  Resolves the stored row when it was actually added (a new index
+   *  entry), undefined when the species was already met. */
+  async markSeen(dexId: number, seenOn: string): Promise<Encounter | undefined> {
+    const row: Encounter = { dexId, seenAt: Date.now(), seenOn };
     try {
-      await this.table.add({ dexId, seenAt: Date.now(), seenOn });
+      await this.table.add(row);
+      return row;
     } catch (error) {
-      if (!(error instanceof Dexie.ConstraintError)) throw error;
+      if (error instanceof Dexie.ConstraintError) return undefined;
+      throw error;
     }
   }
 

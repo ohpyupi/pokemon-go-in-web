@@ -1,8 +1,13 @@
+import type { Encounter } from '@/model/db';
 import { pokedex } from '@/model/pokedex';
 import { encounters } from '@/model/encounters';
 import { loadProfile, TRAINER_KEY } from '@/model/trainer';
 import { dexIdFrom, isBlockedHost, registrableDomain } from '@/utils/encounter';
-import { isBackgroundMessage, type ContentMessage } from '@/utils/messages';
+import {
+  isBackgroundMessage,
+  type ContentMessage,
+  type PopupMessage,
+} from '@/utils/messages';
 
 export default defineBackground(() => {
   // The controller: every model read/write from the views lands here.
@@ -20,8 +25,15 @@ export default defineBackground(() => {
         const domain = registrableDomain(message.hostname);
         const dexId = dexIdFrom(profile, domain);
         // Meeting a wild Pokémon indexes it. The sprite must not wait on
-        // this write, so the reply goes out first.
-        void encounters.markSeen(dexId, domain).catch(() => undefined);
+        // this write, so the reply goes out first. A first meeting (a new
+        // dex row) nudges the open popup with the row itself, so its home
+        // grid can merge it in place.
+        void encounters
+          .markSeen(dexId, domain)
+          .then((entry) => {
+            if (entry) notifyPokedexEntryAdded(entry);
+          })
+          .catch(() => undefined);
         return { dexId };
       }
       case 'get-pokedex-data':
@@ -60,4 +72,13 @@ async function broadcast(message: ContentMessage): Promise<void> {
     if (tab.id === undefined) continue;
     browser.tabs.sendMessage(tab.id, message).catch(() => undefined);
   }
+}
+
+/** Send the popup — when it is open — the new dex row, so it can merge it
+ *  into the home grid without a refetch. Sent via runtime, not tabs: only
+ *  extension pages hear it, never content scripts. A closed popup has no
+ *  listener and rejects the send; that's fine (its next open loads fresh). */
+function notifyPokedexEntryAdded(encounter: Encounter): void {
+  const message: PopupMessage = { type: 'pokedex-entry-added', encounter };
+  browser.runtime.sendMessage(message).catch(() => undefined);
 }
