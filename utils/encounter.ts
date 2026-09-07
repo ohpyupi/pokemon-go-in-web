@@ -11,6 +11,7 @@
  * internal hosts — every one of them is localhost or a bare IP literal.
  */
 import { isIP } from 'is-ip';
+import { getDomain } from 'tldts';
 import type { TrainerProfile } from '@/model/trainer';
 
 export const GEN1_COUNT = 151;
@@ -26,9 +27,18 @@ function hashString(input: string): number {
 }
 
 /** Gen-1 dex id (1–151) for a trainer × page domain. */
-export function dexIdFrom(profile: TrainerProfile, hostname: string): number {
-  const seed = `${profile.name}|${profile.gender}|${profile.startedAt}|${hostname}`;
+export function dexIdFrom(profile: TrainerProfile, domain: string): number {
+  const seed = `${profile.name}|${profile.gender}|${profile.startedAt}|${domain}`;
   return (hashString(seed) % GEN1_COUNT) + 1;
+}
+
+/** The registrable domain of a host (chat.deepseek.com → deepseek.com), so
+ *  one site's subdomains never split into different Pokémon. Hosts without a
+ *  real suffix (localhost, IP literals, intranet names) fall back to
+ *  themselves — the blacklist keeps the important ones out anyway. */
+export function registrableDomain(hostname: string): string {
+  const host = hostname.toLowerCase();
+  return getDomain(host) ?? host;
 }
 
 // ---- host blacklist ----
