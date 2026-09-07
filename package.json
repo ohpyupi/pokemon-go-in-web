@@ -12,6 +12,8 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome check --write .",
     "postinstall": "wxt prepare",
     "build:pokemon-sprites-icon": "node scripts/download-icons.ts",
     "seed:species": "node scripts/fetch-species.ts"
@@ -24,6 +26,7 @@
     "tldts": "^7.4.11"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.12",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@wxt-dev/module-react": "^1.1.5",

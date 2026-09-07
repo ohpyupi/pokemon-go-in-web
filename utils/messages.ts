@@ -7,8 +7,8 @@
  * narrow an arbitrary incoming message to its union before handling it.
  */
 
-import type { PokedexRow } from '@/model/pokedex';
 import type { Encounter } from '@/model/db';
+import type { PokedexRow } from '@/model/pokedex';
 
 /** Messages the background listens for (sent up by content scripts and
  *  the popup — the popup reads model data through the controller). */
@@ -23,8 +23,10 @@ export type ContentMessage =
 
 /** Messages the popup listens for (broadcast by the background while the
  *  popup is open — a closed popup has no listener, which is fine). */
-export type PopupMessage =
-  | { type: 'pokedex-entry-added'; encounter: Encounter }; // a first
+export type PopupMessage = {
+  type: 'pokedex-entry-added';
+  encounter: Encounter;
+}; // a first
 // meeting: the popup merges the row in place instead of refetching
 
 /** Reply to get-encounter: a dexId, or null when there is no encounter here. */
@@ -34,7 +36,9 @@ export type EncounterReply = { dexId: number | null };
 export type PokedexReply = { rows: PokedexRow[] };
 
 /** True when `message` is one the background must handle. */
-export function isBackgroundMessage(message: unknown): message is BackgroundMessage {
+export function isBackgroundMessage(
+  message: unknown,
+): message is BackgroundMessage {
   return isOneOf(message, 'get-encounter', 'get-pokedex-data');
 }
 

@@ -16,7 +16,9 @@ function PokedexHome({ onOpen }: { onOpen: (row: PokedexRow) => void }) {
 
   const load = async (): Promise<void> => {
     try {
-      const reply = (await browser.runtime.sendMessage(MESSAGE)) as PokedexReply;
+      const reply = (await browser.runtime.sendMessage(
+        MESSAGE,
+      )) as PokedexReply;
       setRows(reply.rows);
       setFailed(false);
     } catch {

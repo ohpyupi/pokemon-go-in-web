@@ -17,7 +17,10 @@ export class EncountersRepository {
    *  same species must not overwrite when/where it first appeared.
    *  Resolves the stored row when it was actually added (a new index
    *  entry), undefined when the species was already met. */
-  async markSeen(dexId: number, seenOn: string): Promise<Encounter | undefined> {
+  async markSeen(
+    dexId: number,
+    seenOn: string,
+  ): Promise<Encounter | undefined> {
     const row: Encounter = { dexId, seenAt: Date.now(), seenOn };
     try {
       await this.table.add(row);

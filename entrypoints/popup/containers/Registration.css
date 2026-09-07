@@ -50,7 +50,10 @@
   font: inherit;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.15s, background 0.15s, color 0.15s;
+  transition:
+    opacity 0.15s,
+    background 0.15s,
+    color 0.15s;
 }
 
 .gender-btn:hover {
@@ -84,7 +87,9 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   cursor: pointer;
-  transition: filter 0.15s, transform 0.05s;
+  transition:
+    filter 0.15s,
+    transform 0.05s;
 }
 
 .cta:hover {

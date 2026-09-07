@@ -85,7 +85,10 @@ h1 {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s;
 }
 
 .tab:hover {

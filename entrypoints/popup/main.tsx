@@ -3,7 +3,13 @@ import ReactDOM from 'react-dom/client';
 import './style.css';
 import App from './App.tsx';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const root = document.getElementById('root');
+if (root === null) {
+  // index.html always carries the #root div — the popup can't run without it.
+  throw new Error('No #root element found');
+}
+
+ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,

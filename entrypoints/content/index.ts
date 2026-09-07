@@ -1,8 +1,8 @@
 import { isBlockedHost } from '@/utils/encounter';
 import {
-  isContentMessage,
   type BackgroundMessage,
   type EncounterReply,
+  isContentMessage,
 } from '@/utils/messages';
 import { PokemonSprite } from './PokemonSprite';
 import './style.css';
@@ -58,9 +58,9 @@ async function getEncounter(): Promise<number | null> {
       type: 'get-encounter',
       hostname: location.hostname,
     } satisfies BackgroundMessage;
-    const res = (await browser.runtime.sendMessage(
-      message,
-    )) as EncounterReply | undefined;
+    const res = (await browser.runtime.sendMessage(message)) as
+      | EncounterReply
+      | undefined;
     return res?.dexId ?? null;
   } catch {
     return null;
