@@ -1,6 +1,14 @@
-import { isBlockedHost } from '../../utils/encounter';
+import { isBlockedHost } from '@/utils/encounter';
+import {
+  isContentMessage,
+  type BackgroundMessage,
+  type EncounterReply,
+} from '@/utils/messages';
 import { PokemonSprite } from './PokemonSprite';
 import './style.css';
+
+/** The sprite currently wandering this page, or null between encounters. */
+let pokemon: PokemonSprite | null = null;
 
 export default defineContentScript({
   matches: ['<all_urls>'],
@@ -11,22 +19,49 @@ export default defineContentScript({
 
     // The background service worker owns the encounter logic: it derives the
     // dexId from the trainer's seed × this page's domain. The content script
-    // only renders the result.
-    const dexId = await getEncounter();
-    if (dexId) {
-      const pokemon = new PokemonSprite(dexId); // builds + appends its DOM
-      pokemon.start(); // wander loop runs until destroy()
-    }
+    // only renders the result — once at page load, and again on demand when
+    // the background broadcasts that the trainer profile (the seed) changed.
+    browser.runtime.onMessage.addListener((message: unknown) => {
+      if (!isContentMessage(message)) return;
+      switch (message.type) {
+        case 'destroy':
+          // Trainer erased ("New game"): the world goes quiet here too.
+          pokemon?.destroy();
+          pokemon = null;
+          break;
+        case 'spawn':
+          // Trainer (re)created: re-resolve this page against the new seed.
+          void spawn();
+          break;
+      }
+    });
+
+    await spawn(); // the page's own load-time encounter
   },
 });
 
+/** Resolve this page's encounter with the background and render the sprite,
+ *  replacing any sprite already present. */
+async function spawn(): Promise<void> {
+  pokemon?.destroy();
+  pokemon = null;
+  const dexId = await getEncounter();
+  if (dexId) {
+    pokemon = new PokemonSprite(dexId); // builds + appends its DOM
+    pokemon.start(); // wander loop runs until destroy()
+  }
+}
+
 async function getEncounter(): Promise<number | null> {
   try {
-    const res = (await browser.runtime.sendMessage({
+    const message = {
       type: 'get-encounter',
       hostname: location.hostname,
-    })) as { dexId?: number } | undefined;
-    return res?.dexId ? res.dexId : null;
+    } satisfies BackgroundMessage;
+    const res = (await browser.runtime.sendMessage(
+      message,
+    )) as EncounterReply | undefined;
+    return res?.dexId ?? null;
   } catch {
     return null;
   }
