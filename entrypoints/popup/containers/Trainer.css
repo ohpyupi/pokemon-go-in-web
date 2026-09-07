@@ -1,0 +1,31 @@
+/* Trainer page: the profile card and the New-game reset. */
+
+.gender-chip {
+  display: inline-block;
+  margin: 0.25rem 0 0.5rem;
+  padding: 0.15rem 0.7rem;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  font-size: 0.85rem;
+}
+
+.stamp {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.reset {
+  margin-top: 1.1rem;
+  border: none;
+  background: none;
+  color: #9aa0a8;
+  font: inherit;
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.reset:hover {
+  color: var(--error);
+}
