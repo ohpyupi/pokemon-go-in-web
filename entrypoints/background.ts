@@ -1,12 +1,11 @@
-import type { Encounter } from '@/model/db';
 import { encounters } from '@/model/encounters';
 import { pokedex } from '@/model/pokedex';
 import { loadProfile, TRAINER_KEY } from '@/model/trainer';
 import { dexIdFrom, isBlockedHost, registrableDomain } from '@/utils/encounter';
 import {
-  type ContentMessage,
   isBackgroundMessage,
-  type PopupMessage,
+  sendEventToContent,
+  sendEventToPopup,
 } from '@/utils/messages';
 
 export default defineBackground(() => {
@@ -25,7 +24,12 @@ export default defineBackground(() => {
         const domain = registrableDomain(message.hostname);
         const dexId = dexIdFrom(profile, domain);
         const entry = await encounters.markSeen(dexId, domain);
-        if (entry) notifyPokedexEntryAdded(entry);
+        if (entry) {
+          await sendEventToPopup({
+            type: 'pokedex-entry-added',
+            encounter: entry,
+          });
+        }
         return { dexId };
       }
       case 'get-pokedex-data':
@@ -44,33 +48,11 @@ export default defineBackground(() => {
     if (areaName !== 'local') return;
     const change = changes[TRAINER_KEY];
     if (!change) return;
-    const message: ContentMessage = change.newValue
-      ? { type: 'spawn' }
-      : { type: 'destroy' };
-    await broadcast(message);
+    await sendEventToContent(
+      change.newValue ? { type: 'spawn' } : { type: 'destroy' },
+    );
     if (!change.newValue) {
       await encounters.removeAll(); // no trainer → no adventure → no index
     }
   });
 });
-
-/** Send a command to every tab that has a content script listening. Tabs
- *  without one (chrome://, the Web Store, …) reject the send — there is
- *  nothing to command there, and each page's own load-time spawn keeps the
- *  world consistent anyway. */
-async function broadcast(message: ContentMessage): Promise<void> {
-  const tabs = await browser.tabs.query({});
-  for (const tab of tabs) {
-    if (tab.id === undefined) continue;
-    browser.tabs.sendMessage(tab.id, message).catch(() => undefined);
-  }
-}
-
-/** Send the popup — when it is open — the new dex row, so it can merge it
- *  into the home grid without a refetch. Sent via runtime, not tabs: only
- *  extension pages hear it, never content scripts. A closed popup has no
- *  listener and rejects the send; that's fine (its next open loads fresh). */
-function notifyPokedexEntryAdded(encounter: Encounter): void {
-  const message: PopupMessage = { type: 'pokedex-entry-added', encounter };
-  browser.runtime.sendMessage(message).catch(() => undefined);
-}

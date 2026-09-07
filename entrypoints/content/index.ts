@@ -1,9 +1,5 @@
 import { isBlockedHost } from '@/utils/encounter';
-import {
-  type BackgroundMessage,
-  type EncounterReply,
-  isContentMessage,
-} from '@/utils/messages';
+import { isContentMessage, sendRequestToBackground } from '@/utils/messages';
 import { PokemonSprite } from './PokemonSprite';
 import './style.css';
 
@@ -41,28 +37,20 @@ export default defineContentScript({
 });
 
 /** Resolve this page's encounter with the background and render the sprite,
- *  replacing any sprite already present. */
+ *  replacing any sprite already present. When the background is unreachable
+ *  or has no encounter for this page, the page simply stays quiet. */
 async function spawn(): Promise<void> {
   pokemon?.destroy();
   pokemon = null;
-  const dexId = await getEncounter();
-  if (dexId) {
-    pokemon = new PokemonSprite(dexId); // builds + appends its DOM
-    pokemon.start(); // wander loop runs until destroy()
-  }
-}
-
-async function getEncounter(): Promise<number | null> {
   try {
-    const message = {
+    const { dexId } = await sendRequestToBackground({
       type: 'get-encounter',
       hostname: location.hostname,
-    } satisfies BackgroundMessage;
-    const res = (await browser.runtime.sendMessage(message)) as
-      | EncounterReply
-      | undefined;
-    return res?.dexId ?? null;
+    });
+    if (!dexId) return;
+    pokemon = new PokemonSprite(dexId); // builds + appends its DOM
+    pokemon.start(); // wander loop runs until destroy()
   } catch {
-    return null;
+    // no answer (service worker asleep, race…) — this page stays quiet
   }
 }

@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { PokedexRow } from '@/model/pokedex';
-import type { BackgroundMessage, PokedexReply } from '@/utils/messages';
+import { sendRequestToBackground } from '@/utils/messages';
 import PokemonIcon from '../components/PokemonIcon';
 import usePopupListener from '../hooks/usePopupListener';
 import './PokedexHome.css';
-
-/** The popup's one model read: the background answers with all 151 rows. */
-const MESSAGE: BackgroundMessage = { type: 'get-pokedex-data' };
 
 /** The home grid: one clickable icon per met species. Clicking a species
  *  opens its PokedexView detail page. */
@@ -16,9 +13,8 @@ function PokedexHome({ onOpen }: { onOpen: (row: PokedexRow) => void }) {
 
   const load = async (): Promise<void> => {
     try {
-      const reply = (await browser.runtime.sendMessage(
-        MESSAGE,
-      )) as PokedexReply;
+      // The popup's one model read: the background answers with all 151 rows.
+      const reply = await sendRequestToBackground({ type: 'get-pokedex-data' });
       setRows(reply.rows);
       setFailed(false);
     } catch {
