@@ -5,7 +5,7 @@ import {
   saveProfile,
   type TrainerProfile,
   type Gender,
-} from '../../utils/trainer';
+} from '@/utils/trainer';
 import './App.css';
 
 const NAME_MAX = 12; // classic game limit
