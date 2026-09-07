@@ -7,8 +7,13 @@
  * narrow an arbitrary incoming message to its union before handling it.
  */
 
-/** Messages the background listens for (sent up by content scripts). */
-export type BackgroundMessage = { type: 'get-encounter'; hostname: string };
+import type { PokedexRow } from '@/model/pokedex';
+
+/** Messages the background listens for (sent up by content scripts and
+ *  the popup — the popup reads model data through the controller). */
+export type BackgroundMessage =
+  | { type: 'get-encounter'; hostname: string }
+  | { type: 'get-pokedex-data' }; // popup: all species + encounter state
 
 /** Messages content scripts listen for (broadcast down by the background). */
 export type ContentMessage =
@@ -18,9 +23,12 @@ export type ContentMessage =
 /** Reply to get-encounter: a dexId, or null when there is no encounter here. */
 export type EncounterReply = { dexId: number | null };
 
+/** Reply to get-pokedex-data: the rows (all 151 species + encounter state). */
+export type PokedexReply = { rows: PokedexRow[] };
+
 /** True when `message` is one the background must handle. */
 export function isBackgroundMessage(message: unknown): message is BackgroundMessage {
-  return isOneOf(message, 'get-encounter');
+  return isOneOf(message, 'get-encounter', 'get-pokedex-data');
 }
 
 /** True when `message` is one a content script must handle. */

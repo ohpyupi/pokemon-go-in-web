@@ -1,0 +1,99 @@
+/* Pokedex entry: one species' full dex record, opened from the home grid. */
+
+.view {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  overflow-x: hidden; /* never scroll sideways — the 340px screen is fixed */
+  padding: 0.1rem 0.35rem 0.9rem;
+  scrollbar-width: thin;
+}
+
+.back {
+  align-self: flex-start;
+  padding: 0.3rem 0;
+  border: none;
+  background: none;
+  color: var(--red);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.sprite {
+  margin: 0 0 0.9rem; /* space between the sprite and the seen-card */
+}
+
+.sprite img {
+  display: block;
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated; /* the 32px art scaled up 3×, kept crisp */
+}
+
+.view-name {
+  margin: 0.45rem 0 0.2rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.dex-no {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.meta {
+  box-sizing: border-box; /* width 100% includes the border */
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  text-align: left;
+}
+
+.meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.meta-row + .meta-row {
+  border-top: 1px solid var(--line);
+}
+
+.meta-label {
+  flex: 0 0 82px;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.meta-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.meta-desc {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}

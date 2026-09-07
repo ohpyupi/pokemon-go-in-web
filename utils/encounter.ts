@@ -11,7 +11,7 @@
  * internal hosts — every one of them is localhost or a bare IP literal.
  */
 import { isIP } from 'is-ip';
-import type { TrainerProfile } from './trainer';
+import type { TrainerProfile } from '@/model/trainer';
 
 export const GEN1_COUNT = 151;
 

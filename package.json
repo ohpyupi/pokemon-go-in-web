@@ -13,9 +13,11 @@
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
     "postinstall": "wxt prepare",
-    "build:pokemon-sprites-icon": "node scripts/download-icons.ts"
+    "build:pokemon-sprites-icon": "node scripts/download-icons.ts",
+    "seed:species": "node scripts/fetch-species.ts"
   },
   "dependencies": {
+    "dexie": "^4.4.5",
     "is-ip": "^5.0.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"

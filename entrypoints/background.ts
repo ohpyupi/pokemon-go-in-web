@@ -1,22 +1,38 @@
+import { pokedex } from '@/model/pokedex';
+import { encounters } from '@/model/encounters';
+import { loadProfile, TRAINER_KEY } from '@/model/trainer';
 import { dexIdFrom, isBlockedHost } from '@/utils/encounter';
 import { isBackgroundMessage, type ContentMessage } from '@/utils/messages';
-import { loadProfile, TRAINER_KEY } from '@/utils/trainer';
 
 export default defineBackground(() => {
+  // The controller: every model read/write from the views lands here.
   browser.runtime.onMessage.addListener(async (message: unknown) => {
     if (!isBackgroundMessage(message)) return;
-    // dexId = f(trainer seed, hostname): deterministic per trainer × page.
-    // No trainer profile yet, or a blacklisted (dev/internal) host →
-    // no encounter (register in the popup first).
-    const profile = await loadProfile();
-    if (!profile || isBlockedHost(message.hostname)) return { dexId: null };
-    return { dexId: dexIdFrom(profile, message.hostname) };
+    switch (message.type) {
+      case 'get-encounter': {
+        // dexId = f(trainer seed, hostname): deterministic per trainer ×
+        // page. No trainer profile yet, or a blacklisted (dev/internal)
+        // host → no encounter (register in the popup first).
+        const profile = await loadProfile();
+        if (!profile || isBlockedHost(message.hostname)) return { dexId: null };
+        const dexId = dexIdFrom(profile, message.hostname);
+        // Meeting a wild Pokémon indexes it. The sprite must not wait on
+        // this write, so the reply goes out first.
+        void encounters.markSeen(dexId, message.hostname).catch(() => undefined);
+        return { dexId };
+      }
+      case 'get-pokedex-data':
+        // The popup (the Pokédex view) reads the model through here —
+        // Dexie never leaves the background.
+        return { rows: await pokedex.getAll() };
+    }
   });
 
-  // The trainer profile is the world's seed. When it is cleared ("New game")
-  // every page's sprite must die; when it is (re)created (registration) every
-  // page must re-resolve its encounter against the new seed. The popup only
-  // writes storage — the background reacts, so no extra hops are needed.
+  // The trainer profile is the world's seed. When it is cleared ("New
+  // game") every page's sprite must die — and the index with it, since
+  // both belong to the trainer. When it is (re)created (registration)
+  // every page re-resolves its encounter against the new seed. The popup
+  // only writes storage — the background reacts, so no extra hops.
   browser.storage.onChanged.addListener(async (changes, areaName) => {
     if (areaName !== 'local') return;
     const change = changes[TRAINER_KEY];
@@ -25,6 +41,9 @@ export default defineBackground(() => {
       ? { type: 'spawn' }
       : { type: 'destroy' };
     await broadcast(message);
+    if (!change.newValue) {
+      await encounters.removeAll(); // no trainer → no adventure → no index
+    }
   });
 });
 
