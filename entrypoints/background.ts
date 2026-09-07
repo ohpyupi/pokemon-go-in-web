@@ -1,7 +1,7 @@
 import { pokedex } from '@/model/pokedex';
 import { encounters } from '@/model/encounters';
 import { loadProfile, TRAINER_KEY } from '@/model/trainer';
-import { dexIdFrom, isBlockedHost } from '@/utils/encounter';
+import { dexIdFrom, isBlockedHost, registrableDomain } from '@/utils/encounter';
 import { isBackgroundMessage, type ContentMessage } from '@/utils/messages';
 
 export default defineBackground(() => {
@@ -15,10 +15,13 @@ export default defineBackground(() => {
         // host → no encounter (register in the popup first).
         const profile = await loadProfile();
         if (!profile || isBlockedHost(message.hostname)) return { dexId: null };
-        const dexId = dexIdFrom(profile, message.hostname);
+        // Subdomains don't matter: chat.deepseek.com and platform.deepseek.com
+        // are one place in the wild — one domain, one Pokémon.
+        const domain = registrableDomain(message.hostname);
+        const dexId = dexIdFrom(profile, domain);
         // Meeting a wild Pokémon indexes it. The sprite must not wait on
         // this write, so the reply goes out first.
-        void encounters.markSeen(dexId, message.hostname).catch(() => undefined);
+        void encounters.markSeen(dexId, domain).catch(() => undefined);
         return { dexId };
       }
       case 'get-pokedex-data':
