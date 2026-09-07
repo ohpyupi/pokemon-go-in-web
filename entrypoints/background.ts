@@ -24,16 +24,8 @@ export default defineBackground(() => {
         // are one place in the wild — one domain, one Pokémon.
         const domain = registrableDomain(message.hostname);
         const dexId = dexIdFrom(profile, domain);
-        // Meeting a wild Pokémon indexes it. The sprite must not wait on
-        // this write, so the reply goes out first. A first meeting (a new
-        // dex row) nudges the open popup with the row itself, so its home
-        // grid can merge it in place.
-        void encounters
-          .markSeen(dexId, domain)
-          .then((entry) => {
-            if (entry) notifyPokedexEntryAdded(entry);
-          })
-          .catch(() => undefined);
+        const entry = await encounters.markSeen(dexId, domain);
+        if (entry) notifyPokedexEntryAdded(entry);
         return { dexId };
       }
       case 'get-pokedex-data':
