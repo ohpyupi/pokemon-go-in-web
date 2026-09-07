@@ -23,8 +23,13 @@ export interface PokedexRow {
 export class PokedexRepository {
   /** All 151 species in dex order with their encounter state. */
   async getAll(): Promise<PokedexRow[]> {
-    const [species, met] = await Promise.all([pokemon.getAll(), encounters.getAll()]);
-    const byDexId = new Map(met.map((encounter) => [encounter.dexId, encounter]));
+    const [species, met] = await Promise.all([
+      pokemon.getAll(),
+      encounters.getAll(),
+    ]);
+    const byDexId = new Map(
+      met.map((encounter) => [encounter.dexId, encounter]),
+    );
     return species.map(({ dexId, name, description }) => {
       const encounter = byDexId.get(dexId);
       return {

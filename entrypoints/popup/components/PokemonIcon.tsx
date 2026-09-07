@@ -4,7 +4,9 @@ import type { PublicPath } from 'wxt/browser';
  *  script wanders the page with. WXT's getURL only accepts typed
  *  `PublicPath` literals, hence the cast. */
 function PokemonIcon({ dexId, alt }: { dexId: number; alt: string }) {
-  const src = browser.runtime.getURL(`pokemon-icons/${dexId}.png` as PublicPath);
+  const src = browser.runtime.getURL(
+    `pokemon-icons/${dexId}.png` as PublicPath,
+  );
   return <img src={src} alt={alt} />;
 }
 

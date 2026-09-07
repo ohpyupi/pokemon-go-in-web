@@ -1,11 +1,11 @@
 import type { Encounter } from '@/model/db';
-import { pokedex } from '@/model/pokedex';
 import { encounters } from '@/model/encounters';
+import { pokedex } from '@/model/pokedex';
 import { loadProfile, TRAINER_KEY } from '@/model/trainer';
 import { dexIdFrom, isBlockedHost, registrableDomain } from '@/utils/encounter';
 import {
-  isBackgroundMessage,
   type ContentMessage,
+  isBackgroundMessage,
   type PopupMessage,
 } from '@/utils/messages';
 

@@ -35,7 +35,7 @@
   grid-template-columns: repeat(8, 32px);
   gap: 3px;
   justify-content: center;
-    padding: 3px;
+  padding: 3px;
 }
 
 .cell {

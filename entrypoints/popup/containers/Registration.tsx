@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { type FormEvent, useState } from 'react';
 import type { Gender, TrainerProfile } from '@/model/trainer';
 import './Registration.css';
 
@@ -51,7 +51,6 @@ function Registration({
           value={name}
           maxLength={NAME_MAX}
           placeholder="e.g. Ash"
-          autoFocus
           onChange={(e) => setName(e.target.value)}
         />
       </label>
