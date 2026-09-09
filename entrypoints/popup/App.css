@@ -1,7 +1,7 @@
 /* Device shell — App.tsx's stylesheet at the popup root: the screen frame,
- * brand, tabs, and footer. The design tokens live here; every container/
- * view stylesheet reads them. Shared page typography (h1) too: the
- * registration and trainer pages both use it.
+ * tabs, and footer. The design tokens live here; every container/view
+ * stylesheet reads them. Shared page typography (h1) too: the registration
+ * and trainer pages both use it. (The top bar now lives in NavBar.css.)
  * Theme: classic Poké Ball red on white. */
 
 :root {
@@ -15,48 +15,33 @@
   --error: #d32f2f;
 }
 
+body {
+  padding: 0;
+  margin: 0;
+}
+
 .screen {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   width: 340px;
   height: 560px;
-  padding: 1.25rem 1.5rem 0.5rem 1.5rem;
   color: var(--text);
   background: #ffffff;
   text-align: center;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  margin: 0 0 0.9rem;
-  color: var(--red);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-.brand-ball {
-  width: 18px;
-  height: 18px;
-}
-
 h1 {
-  margin: 0 0 0.35rem;
-  font-size: 1.6rem;
-  letter-spacing: 0.02em;
+  margin: 0 0 8px;
+  font-size: 24px;
 }
 
 .version {
-  margin: auto 0 0;
-  padding-top: 0.35rem;
+  margin: auto 0 8px;
+  padding-top: 4px;
   border-top: 1px solid var(--line);
   color: var(--text-muted);
-  font-size: 0.6rem;
+  font-size: 8px;
 }
 
 .device {
@@ -66,23 +51,38 @@ h1 {
   flex-direction: column;
 }
 
+.view {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 16px;
+}
+
+.view--center {
+  align-items: center;
+}
+
 .tabs {
   display: flex;
-  gap: 0.6rem;
-  margin-bottom: 0.9rem;
+  gap: 24px;
+  margin-bottom: 16px;
+  padding: 0 16px;
+  justify-content: center;
 }
 
 .tab {
-  flex: 1;
-  padding: 0.4rem 0;
+  padding: 4px 16px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: #ffffff;
   color: var(--text-muted);
   font: inherit;
-  font-size: 0.72rem;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.16em;
+  letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
   transition:

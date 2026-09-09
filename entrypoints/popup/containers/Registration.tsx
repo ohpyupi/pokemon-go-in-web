@@ -5,7 +5,7 @@ import './Registration.css';
 const NAME_MAX = 12; // classic game limit
 
 /** First run: capture the trainer's name, gender, and start time. */
-function Registration({
+export function Registration({
   onRegister,
 }: {
   onRegister: (trainer: TrainerProfile) => Promise<void>;
@@ -40,7 +40,7 @@ function Registration({
   };
 
   return (
-    <form onSubmit={(e) => void submit(e)}>
+    <form className="view" onSubmit={(e) => void submit(e)}>
       <h1>Welcome, Trainer!</h1>
 
       <label className="field" htmlFor="trainer-name">
@@ -77,5 +77,3 @@ function Registration({
     </form>
   );
 }
-
-export default Registration;

@@ -1,0 +1,41 @@
+/* NavBar: the device's top bar — the back arrow on the left, the brand in
+ * the center, and the (empty) settings slot on the right. The three-column
+ * grid keeps the brand truly centered while either side is empty. */
+
+.top-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin: 8px 0;
+  padding: 0 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.nav-back {
+  justify-self: start;
+  padding: 2px 8px 2px 0;
+  border: none;
+  background: none;
+  color: var(--red);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.brand-ball {
+  width: 16px;
+  height: 16px;
+}

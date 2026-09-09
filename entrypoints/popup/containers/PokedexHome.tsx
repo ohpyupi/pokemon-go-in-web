@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import type { PokedexRow } from '@/model/pokedex';
 import { sendRequestToBackground } from '@/utils/messages';
-import PokemonIcon from '../components/PokemonIcon';
-import usePopupListener from '../hooks/usePopupListener';
+import { PokemonIcon } from '../components/PokemonIcon';
+import { usePopupListener } from '../hooks/usePopupListener';
 import './PokedexHome.css';
 
 /** The home grid: one clickable icon per met species. Clicking a species
  *  opens its PokedexView detail page. */
-function PokedexHome({ onOpen }: { onOpen: (row: PokedexRow) => void }) {
+export function PokedexHome({ onOpen }: { onOpen: (row: PokedexRow) => void }) {
   const [rows, setRows] = useState<PokedexRow[] | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -53,7 +53,7 @@ function PokedexHome({ onOpen }: { onOpen: (row: PokedexRow) => void }) {
 
   if (failed) {
     return (
-      <div className="index">
+      <div className="view">
         <p className="status">Could not read the index.</p>
         <button type="button" className="retry" onClick={() => void load()}>
           Try again
@@ -67,29 +67,25 @@ function PokedexHome({ onOpen }: { onOpen: (row: PokedexRow) => void }) {
   const seen = rows === null ? [] : rows.filter((row) => row.seenAt !== null);
 
   return (
-    <div className="index">
+    <div className="view">
       <p className="index-count">
         {rows === null ? 'Opening the index…' : `${seen.length} / 151 indexed`}
       </p>
       {rows !== null && seen.length > 0 && (
-        <div className="index-scroll">
-          <div className="index-grid">
-            {seen.map((row) => (
-              <button
-                key={row.dexId}
-                type="button"
-                className="cell"
-                title={`#${row.dexId} ${row.name}`}
-                onClick={() => onOpen(row)}
-              >
-                <PokemonIcon dexId={row.dexId} alt={row.name} />
-              </button>
-            ))}
-          </div>
+        <div className="index-grid">
+          {seen.map((row) => (
+            <button
+              key={row.dexId}
+              type="button"
+              className="cell"
+              title={`#${row.dexId} ${row.name}`}
+              onClick={() => onOpen(row)}
+            >
+              <PokemonIcon dexId={row.dexId} alt={row.name} />
+            </button>
+          ))}
         </div>
       )}
     </div>
   );
 }
-
-export default PokedexHome;

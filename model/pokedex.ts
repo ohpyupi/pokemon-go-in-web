@@ -4,15 +4,25 @@
  * popup, so the view never joins anything itself.
  */
 
+import type { PokemonType } from './db';
 import { encounters } from './encounters';
 import { pokemon } from './pokemon';
 
-/** One Pokédex row: the species (name + description) plus its meeting
- *  state (null = not met). */
+/** The popup-facing alias of the type slugs (see db.ts). */
+export type { PokemonType };
+
+/** One Pokédex row: the species (name, description, modern types, size)
+ *  plus its meeting state (null = not met). */
 export interface PokedexRow {
   dexId: number;
   name: string;
   description: string;
+  /** Modern type slugs, primary first. */
+  types: PokemonType[];
+  /** Height in decimeters (PokeAPI raw unit). */
+  height: number;
+  /** Weight in hectograms (PokeAPI raw unit). */
+  weight: number;
   seenAt: number | null;
   seenOn: string | null;
 }
@@ -30,16 +40,21 @@ export class PokedexRepository {
     const byDexId = new Map(
       met.map((encounter) => [encounter.dexId, encounter]),
     );
-    return species.map(({ dexId, name, description }) => {
-      const encounter = byDexId.get(dexId);
-      return {
-        dexId,
-        name,
-        description,
-        seenAt: encounter?.seenAt ?? null,
-        seenOn: encounter?.seenOn ?? null,
-      };
-    });
+    return species.map(
+      ({ dexId, name, description, types, height, weight }) => {
+        const encounter = byDexId.get(dexId);
+        return {
+          dexId,
+          name,
+          description,
+          types,
+          height,
+          weight,
+          seenAt: encounter?.seenAt ?? null,
+          seenOn: encounter?.seenOn ?? null,
+        };
+      },
+    );
   }
 }
 

@@ -2,7 +2,7 @@ import type { TrainerProfile } from '@/model/trainer';
 import './Trainer.css';
 
 /** The Trainer page: the profile card and the "New game" reset. */
-function Trainer({
+export function Trainer({
   profile,
   onReset,
 }: {
@@ -10,7 +10,7 @@ function Trainer({
   onReset: () => void;
 }) {
   return (
-    <>
+    <div className="view view--center">
       <h1>{profile.name}</h1>
       <p className="gender-chip">
         {profile.gender === 'boy' ? '♂ Boy' : '♀ Girl'}
@@ -26,8 +26,6 @@ function Trainer({
       <button type="button" className="reset" onClick={onReset}>
         New game — erase trainer
       </button>
-    </>
+    </div>
   );
 }
-
-export default Trainer;

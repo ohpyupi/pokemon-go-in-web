@@ -6,10 +6,11 @@ import {
   saveProfile,
   type TrainerProfile,
 } from '@/model/trainer';
-import PokedexEntry from './containers/PokedexEntry';
-import PokedexHome from './containers/PokedexHome';
-import Registration from './containers/Registration';
-import Trainer from './containers/Trainer';
+import { NavBar } from './components/NavBar';
+import { PokedexEntry } from './containers/PokedexEntry';
+import { PokedexHome } from './containers/PokedexHome';
+import { Registration } from './containers/Registration';
+import { Trainer } from './containers/Trainer';
 import './App.css';
 
 /** The extension version, straight from the manifest. */
@@ -23,7 +24,7 @@ type ProfileState = TrainerProfile | null | undefined;
 type Page = 'pokedex' | 'pokedex-entry' | 'trainer';
 
 /** The device shell: brand header, the trainer gate, and the page tabs. */
-function App() {
+export function App() {
   const [profile, setProfile] = useState<ProfileState>(undefined);
   const [page, setPage] = useState<Page>('pokedex');
   /** The species opened from the home grid — rendered on the entry page. */
@@ -57,20 +58,14 @@ function App() {
 
   return (
     <main className="screen">
-      <p className="brand">
-        <img className="brand-ball" src="/poke-ball.png" alt="" />
-        Pokémon GO in Web
-      </p>
+      <NavBar
+        showBack={page === 'pokedex-entry' && entry !== null}
+        onBack={() => setPage('pokedex')}
+      />
       {profile === null ? (
         <Registration onRegister={register} />
       ) : page === 'pokedex-entry' && entry !== null ? (
-        <div className="device">
-          <PokedexEntry
-            row={entry}
-            trainerName={profile.name}
-            onBack={() => setPage('pokedex')}
-          />
-        </div>
+        <PokedexEntry row={entry} trainerName={profile.name} />
       ) : (
         <div className="device">
           <nav className="tabs">
@@ -100,5 +95,3 @@ function App() {
     </main>
   );
 }
-
-export default App;

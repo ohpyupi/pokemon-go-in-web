@@ -1,0 +1,83 @@
+/* PokemonTypeChip: one type badge — the species' type as a colored pill.
+ * The GO fill color, its matching ring, and the white label with the gray
+ * outline all live here; the page that shows chips just lays them out. */
+
+.pokemon-type-chip {
+  --chip-fill: var(--text-muted); /* unknown type stays neutral */
+  padding: 2px 8px;
+  border-radius: 999px;
+  /* 1px ring in the fill's own color, held off the pill */
+  outline: 1px solid var(--chip-fill);
+  outline-offset: 1px;
+  background: var(--chip-fill);
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 800;
+  /* 1px gray outline around the letters — white text on any fill */
+  text-shadow:
+    -1px -1px 0 var(--text-muted),
+    1px -1px 0 var(--text-muted),
+    -1px 1px 0 var(--text-muted),
+    1px 1px 0 var(--text-muted),
+    -1px 0 0 var(--text-muted),
+    1px 0 0 var(--text-muted),
+    0 -1px 0 var(--text-muted),
+    0 1px 0 var(--text-muted);
+}
+
+/* The 18 types, in Pokémon GO colors — each sets --chip-fill, which the
+ * pill background and its ring both use. */
+.pokemon-type-chip.type-normal {
+  --chip-fill: #9099a1;
+}
+.pokemon-type-chip.type-fire {
+  --chip-fill: #ff9d55;
+}
+.pokemon-type-chip.type-water {
+  --chip-fill: #4d90d5;
+}
+.pokemon-type-chip.type-electric {
+  --chip-fill: #f4d23c;
+}
+.pokemon-type-chip.type-grass {
+  --chip-fill: #63bb5b;
+}
+.pokemon-type-chip.type-ice {
+  --chip-fill: #51c4e7;
+}
+.pokemon-type-chip.type-fighting {
+  --chip-fill: #ce4069;
+}
+.pokemon-type-chip.type-poison {
+  --chip-fill: #ab6ac8;
+}
+.pokemon-type-chip.type-ground {
+  --chip-fill: #d97746;
+}
+.pokemon-type-chip.type-flying {
+  --chip-fill: #92aade;
+}
+.pokemon-type-chip.type-psychic {
+  --chip-fill: #fa7179;
+}
+.pokemon-type-chip.type-bug {
+  --chip-fill: #90c12c;
+}
+.pokemon-type-chip.type-rock {
+  --chip-fill: #c7b78b;
+}
+.pokemon-type-chip.type-ghost {
+  --chip-fill: #5269ac;
+}
+.pokemon-type-chip.type-dragon {
+  --chip-fill: #0b6dc3;
+}
+.pokemon-type-chip.type-dark {
+  --chip-fill: #5a5366;
+}
+.pokemon-type-chip.type-steel {
+  --chip-fill: #5a8ea2;
+}
+.pokemon-type-chip.type-fairy {
+  --chip-fill: #ec8fe6;
+}

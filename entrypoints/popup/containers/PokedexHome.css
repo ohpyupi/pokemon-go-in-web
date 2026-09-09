@@ -1,41 +1,17 @@
 /* Pokedex home: the count header and the grid of met species. */
 
-.index {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
 .index-count {
-  margin: 0 0 0.75rem;
-  font-size: 0.95rem;
+  margin: 0 0 8px;
+  font-size: 16px;
   font-weight: 800;
-}
-
-.index-scroll {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: 4px;
-  scrollbar-width: thin;
-}
-
-.index-scroll::-webkit-scrollbar {
-  width: 8px;
-}
-
-.index-scroll::-webkit-scrollbar-thumb {
-  border-radius: 4px;
-  background: var(--line);
 }
 
 .index-grid {
   display: grid;
   grid-template-columns: repeat(8, 32px);
-  gap: 3px;
+  gap: 4px;
   justify-content: center;
-  padding: 3px;
+  padding: 4px;
 }
 
 .cell {
@@ -43,7 +19,7 @@
   height: 32px;
   padding: 0;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   background: #ffffff;
   box-shadow: inset 0 0 0 1px var(--line);
   cursor: pointer;
@@ -65,20 +41,20 @@
 }
 
 .status {
-  margin: 0.4rem 0;
-  font-size: 0.85rem;
+  margin: 4px 0;
+  font-size: 16px;
   color: var(--text-muted);
 }
 
 .retry {
-  margin-top: 0.4rem;
-  padding: 0.3rem 0.9rem;
+  margin-top: 4px;
+  padding: 4px 16px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: #ffffff;
   color: var(--text-muted);
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 16px;
   cursor: pointer;
 }
 
