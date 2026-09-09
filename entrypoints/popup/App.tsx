@@ -65,7 +65,7 @@ export function App() {
       {profile === null ? (
         <Registration onRegister={register} />
       ) : page === 'pokedex-entry' && entry !== null ? (
-        <PokedexEntry row={entry} trainerName={profile.name} />
+        <PokedexEntry row={entry} />
       ) : (
         <div className="device">
           <nav className="tabs">

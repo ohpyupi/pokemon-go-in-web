@@ -1,18 +1,20 @@
 /**
- * The Pokédex read model: `pokemon` left-joined with `encounters` into one
- * ready-to-render row per species. The controller relays these rows to the
- * popup, so the view never joins anything itself.
+ * The Pokédex read model: the species catalog plus which species have been
+ * met, joined into one ready-to-render row per species. The controller
+ * relays these rows to the popup, so the view never joins anything itself.
+ * Discovery history is not part of the home rows — the entry page fetches
+ * a species' findings separately when it is opened.
  */
 
 import type { PokemonType } from './db';
-import { encounters } from './encounters';
+import { discoveries } from './discoveries';
 import { pokemon } from './pokemon';
 
 /** The popup-facing alias of the type slugs (see db.ts). */
 export type { PokemonType };
 
 /** One Pokédex row: the species (name, description, modern types, size)
- *  plus its meeting state (null = not met). */
+ *  plus its met state (false = never found anywhere yet). */
 export interface PokedexRow {
   dexId: number;
   name: string;
@@ -23,37 +25,31 @@ export interface PokedexRow {
   height: number;
   /** Weight in hectograms (PokeAPI raw unit). */
   weight: number;
-  seenAt: number | null;
-  seenOn: string | null;
+  /** True once the species was found on at least one domain. */
+  met: boolean;
 }
 
 /** The read model over the two tables — read-only, no writes. Everything
  *  outside the model goes through `pokedex` below and never touches Dexie
  *  directly. */
 export class PokedexRepository {
-  /** All 151 species in dex order with their encounter state. */
+  /** All 151 species in dex order with their met state. */
   async getAll(): Promise<PokedexRow[]> {
     const [species, met] = await Promise.all([
       pokemon.getAll(),
-      encounters.getAll(),
+      discoveries.knownSpecies(),
     ]);
-    const byDexId = new Map(
-      met.map((encounter) => [encounter.dexId, encounter]),
-    );
+    const metDexIds = new Set(met);
     return species.map(
-      ({ dexId, name, description, types, height, weight }) => {
-        const encounter = byDexId.get(dexId);
-        return {
-          dexId,
-          name,
-          description,
-          types,
-          height,
-          weight,
-          seenAt: encounter?.seenAt ?? null,
-          seenOn: encounter?.seenOn ?? null,
-        };
-      },
+      ({ dexId, name, description, types, height, weight }) => ({
+        dexId,
+        name,
+        description,
+        types,
+        height,
+        weight,
+        met: metDexIds.has(dexId),
+      }),
     );
   }
 }

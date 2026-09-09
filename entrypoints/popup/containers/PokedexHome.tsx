@@ -26,24 +26,20 @@ export function PokedexHome({ onOpen }: { onOpen: (row: PokedexRow) => void }) {
     void load();
   }, []);
 
-  // While the home page is up, a first meeting elsewhere (another tab's
-  // sprite) broadcasts the new row — merge it in place. The 151 species
-  // (names, descriptions) are already in `rows`, so no refetch is needed.
+  // While the home page is up, a species' first find elsewhere (another
+  // tab's sprite) broadcasts its dex id — light the cell in place. The 151
+  // species (names, descriptions) are already in `rows`, so no refetch is
+  // needed. (The home rows carry no discovery data; the entry page fetches
+  // it when opened.)
   usePopupListener((message) => {
     switch (message.type) {
       case 'pokedex-entry-added': {
-        const { encounter } = message;
+        const { dexId } = message;
         setRows((current) =>
           current === null
             ? current
             : current.map((row) =>
-                row.dexId === encounter.dexId
-                  ? {
-                      ...row,
-                      seenAt: encounter.seenAt,
-                      seenOn: encounter.seenOn,
-                    }
-                  : row,
+                row.dexId === dexId ? { ...row, met: true } : row,
               ),
         );
         break;
@@ -62,18 +58,20 @@ export function PokedexHome({ onOpen }: { onOpen: (row: PokedexRow) => void }) {
     );
   }
 
-  // Only met species earn a slot; the count header still shows the full
+  // Only found species earn a slot; the count header still shows the full
   // progress toward the 151.
-  const seen = rows === null ? [] : rows.filter((row) => row.seenAt !== null);
+  const met = rows === null ? [] : rows.filter((row) => row.met);
 
   return (
     <div className="view">
       <p className="index-count">
-        {rows === null ? 'Opening the index…' : `${seen.length} / 151 indexed`}
+        {rows === null
+          ? 'Opening the index…'
+          : `${met.length} / 151 discovered`}
       </p>
-      {rows !== null && seen.length > 0 && (
+      {rows !== null && met.length > 0 && (
         <div className="index-grid">
-          {seen.map((row) => (
+          {met.map((row) => (
             <button
               key={row.dexId}
               type="button"
