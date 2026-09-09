@@ -19,13 +19,42 @@
 import Dexie, { type Table } from 'dexie';
 import { SPECIES } from './seed/species';
 
-/** A species-catalog row. The description comes with the seed (fetched
- *  from PokeAPI, first English flavor text); future static data (types,
- *  …) joins here and in the seed too. */
+/** The modern type set — the 18 slugs PokeAPI / Pokémon GO use today,
+ *  lowercase (e.g. 'grass', 'fire'). */
+export type PokemonType =
+  | 'normal'
+  | 'fire'
+  | 'water'
+  | 'electric'
+  | 'grass'
+  | 'ice'
+  | 'fighting'
+  | 'poison'
+  | 'ground'
+  | 'flying'
+  | 'psychic'
+  | 'bug'
+  | 'rock'
+  | 'ghost'
+  | 'dragon'
+  | 'dark'
+  | 'steel'
+  | 'fairy';
+
+/** A species-catalog row. All static data comes with the seed (fetched
+ *  from PokeAPI): the first English flavor text as the description, the
+ *  modern type set (current games / Pokémon GO, not Gen-1 originals) and
+ *  the size in PokeAPI raw units. */
 export interface Pokemon {
   dexId: number;
   name: string;
   description: string;
+  /** Modern type slugs, primary first (e.g. ['grass', 'poison']). */
+  types: PokemonType[];
+  /** Height in decimeters. */
+  height: number;
+  /** Weight in hectograms. */
+  weight: number;
 }
 
 /** An index row: this species was met at `seenOn` on `seenAt`. One row per
