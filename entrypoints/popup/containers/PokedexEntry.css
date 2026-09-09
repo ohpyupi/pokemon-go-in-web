@@ -75,3 +75,39 @@
   font-size: 12px;
   line-height: 1.5;
 }
+
+/* The discovery section below the record card: its own heading and rows,
+   unframed so it reads as a section, not a table. */
+.found {
+  width: 100%;
+  margin-top: 12px;
+  text-align: left;
+}
+
+.found-title {
+  margin: 0 0 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.found-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding: 2px 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.found-domain {
+  overflow-wrap: anywhere;
+}
+
+.found-when {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}

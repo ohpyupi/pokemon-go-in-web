@@ -3,11 +3,12 @@
  *
  * One Dexie class over one IndexedDB database ('dex'), holding every table:
  *
- *   pokemon    — the species catalog: all 151 Gen-1 rows, seeded once when
- *                the database is first created (see populate below). Pure
- *                static data; never changes after seed.
- *   encounters — the trainer's index: one row per met species, holding
- *                when and where the meeting happened. Wiped on "New game".
+ *   pokemon     — the species catalog: all 151 Gen-1 rows, seeded once when
+ *                 the database is first created (see populate below). Pure
+ *                 static data; never changes after seed.
+ *   discoveries — the wild log: one row per species × domain where it was
+ *                 found, holding when and where. Kept to the 10 oldest per
+ *                 species (see model/discoveries.ts); wiped on "New game".
  *
  * Schema grows in the constructor: each `version()` adds a migration.
  * Background-only: Dexie must never be bundled into the popup or content
@@ -57,23 +58,28 @@ export interface Pokemon {
   weight: number;
 }
 
-/** An index row: this species was met at `seenOn` on `seenAt`. One row per
- *  species (dexId is the key), so "when it was met" is the first meeting. */
-export interface Encounter {
+/** A discovery row: the species was found on the domain `foundOn` at
+ *  `foundAt`. One row per species × domain — [dexId + foundOn] is the key,
+ *  so each site is recorded once; revisits change nothing. */
+export interface Discovery {
   dexId: number;
-  seenAt: number;
-  seenOn: string;
+  foundOn: string;
+  foundAt: number;
 }
 
 class DexDB extends Dexie {
   pokemon!: Table<Pokemon, number>;
-  encounters!: Table<Encounter, number>;
+  discoveries!: Table<Discovery, [number, string]>;
 
   constructor() {
     super('dex');
     this.version(1).stores({
       pokemon: 'dexId',
-      encounters: 'dexId',
+      // Compound key = one row per species × domain; the plain dexId
+      // index counts a species' rows (the cap) and says which species
+      // are met. A species' ≤10 rows are read off it and sorted in
+      // memory — no timeline index needed.
+      discoveries: '[dexId+foundOn], dexId',
     });
     // Runs exactly once, inside the transaction that creates the database:
     // pour the catalog in. (A version bump later re-runs nothing here.)

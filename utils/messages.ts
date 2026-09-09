@@ -11,7 +11,7 @@
  * change — together.
  */
 
-import type { Encounter } from '@/model/db';
+import type { Discovery } from '@/model/db';
 import type { PokedexRow } from '@/model/pokedex';
 
 /** One answered message: what the sender sends, and the typed reply. */
@@ -20,8 +20,15 @@ type RequestRow<Request, Reply> = { request: Request; reply: Reply };
 /** Answered requests, grouped by who receives and answers them. */
 type RequestProtocol = {
   background: {
-    // popup: the whole index — all 151 species + encounter state
+    // popup: the whole index — all 151 species + met state. Light by
+    // design: a species' discovery history rides its own message below.
     'get-pokedex-data': RequestRow<{}, { rows: PokedexRow[] }>;
+    // popup: one species' discovery history — every domain it was found
+    // on, oldest first. The entry page fetches it lazily when opened.
+    'get-discoveries': RequestRow<
+      { dexId: number },
+      { discoveries: Discovery[] }
+    >;
     // content script: which page is the player on right now?
     'get-encounter': RequestRow<
       { hostname: string },
@@ -40,8 +47,10 @@ type EventProtocol = {
     destroy: {}; // profile erased: remove the sprite
   };
   popup: {
-    // a first meeting: the popup merges the row in place instead of refetching
-    'pokedex-entry-added': { encounter: Encounter };
+    // a species' very first find: the popup lights its cell instead of
+    // refetching. A known species found on a new domain only changes its
+    // entry page, which fetches on open — no broadcast needed.
+    'pokedex-entry-added': { dexId: number };
   };
 };
 
@@ -70,7 +79,12 @@ export type PopupMessage = EventsTo<'popup'>;
 export function isBackgroundMessage(
   message: unknown,
 ): message is BackgroundMessage {
-  return isOneOf(message, 'get-encounter', 'get-pokedex-data');
+  return isOneOf(
+    message,
+    'get-encounter',
+    'get-pokedex-data',
+    'get-discoveries',
+  );
 }
 
 /** True when `message` is one a content script must handle. */
