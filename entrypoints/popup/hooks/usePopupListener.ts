@@ -5,7 +5,9 @@ import { isPopupMessage, type PopupMessage } from '@/utils/messages';
  *  (pokedex-entry-added, …) while this component is mounted. The listener is
  *  attached once; the latest handler runs each time, so callers can inline
  *  their callback without useCallback. */
-function usePopupListener(handler: (message: PopupMessage) => void): void {
+export function usePopupListener(
+  handler: (message: PopupMessage) => void,
+): void {
   const latest = useRef(handler);
   latest.current = handler;
 
@@ -17,5 +19,3 @@ function usePopupListener(handler: (message: PopupMessage) => void): void {
     return () => browser.runtime.onMessage.removeListener(listener);
   }, []);
 }
-
-export default usePopupListener;
