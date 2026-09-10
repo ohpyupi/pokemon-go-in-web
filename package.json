@@ -2,7 +2,7 @@
   "name": "pokemon-go-in-web",
   "description": "Unofficial fan-made game — the web is your Pokémon safari, where a wild Gen-1 Pokémon wanders the bottom of each page you visit.",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.1.1",
   "type": "module",
   "homepage": "https://github.com/ohpyupi/pokemon-go-in-web#readme",
   "bugs": {
