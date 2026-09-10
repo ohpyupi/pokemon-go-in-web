@@ -2,11 +2,11 @@
  * the center, and the (empty) settings slot on the right. The three-column
  * grid keeps the brand truly centered while either side is empty. */
 
-.top-bar {
+.nav-bar {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  margin: 8px 0;
+  margin: 12px 0;
   padding: 0 16px;
 }
 
