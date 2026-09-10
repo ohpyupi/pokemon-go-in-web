@@ -4,6 +4,14 @@
   "private": true,
   "version": "1.1.0",
   "type": "module",
+  "homepage": "https://github.com/ohpyupi/pokemon-go-in-web#readme",
+  "bugs": {
+    "url": "https://github.com/ohpyupi/pokemon-go-in-web/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ohpyupi/pokemon-go-in-web.git"
+  },
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
