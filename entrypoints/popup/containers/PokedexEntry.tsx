@@ -59,10 +59,10 @@ export function PokedexEntry({ row }: { row: PokedexRow }) {
       {foundOn !== null && foundOn.length > 0 && (
         <div className="found">
           <p className="found-title">Found on ({foundOn.length})</p>
-          {foundOn.map((found, index) => (
+          {foundOn.map((found) => (
             <p className="found-row" key={found.foundOn}>
               <span className="found-domain">{found.foundOn}</span>
-              <span className="found-when">{foundWhen(found, index)}</span>
+              <span className="found-when">{foundWhen(found)}</span>
             </p>
           ))}
         </div>
