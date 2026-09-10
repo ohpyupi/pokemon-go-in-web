@@ -11,7 +11,7 @@ export function NavBar({
   onBack: () => void;
 }) {
   return (
-    <nav className="top-bar">
+    <nav className="nav-bar">
       {showBack ? (
         <button
           type="button"
