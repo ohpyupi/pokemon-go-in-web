@@ -4,7 +4,9 @@ Are you bored of just navigating the web? Imagine encountering a wild Pokémon w
 
 Wild **Gen-1 Pokémon** show up at the bottom of the pages you visit and wander around. Which Pokémon meets you on which site is **deterministic** — it depends on *you* (your trainer seed) and the *domain*.
 
-<img src="public/pokemon-go-in-web-screenshot.png" alt="A wild Pokémon wandering along the bottom of a web page" width="640">
+[**Install from the Chrome Web Store**](https://chromewebstore.google.com/detail/pok%C3%A9mon-go-in-web/hbciikmndoknohbafpgfialjamompfca)
+
+<img src="public/pokemon-go-in-web-screenshot-2.png" alt="A wild Pokémon wandering along the bottom of a web page" width="640">
 
 ## How it works
 
