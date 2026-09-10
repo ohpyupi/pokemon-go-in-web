@@ -33,8 +33,8 @@ export function PokedexEntry({ row }: { row: PokedexRow }) {
 
   /** The list is oldest first, so the first row is the origin story: it
    *  keeps the full date and time; later finds show the date only. */
-  const foundWhen = (found: Discovery, index: number): string =>
-      new Date(found.foundAt).toLocaleString()
+  const foundWhen = (found: Discovery): string =>
+    new Date(found.foundAt).toLocaleString();
 
   return (
     <div className="view view--center">
