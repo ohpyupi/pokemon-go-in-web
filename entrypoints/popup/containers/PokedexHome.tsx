@@ -5,8 +5,8 @@ import { PokemonIcon } from '../components/PokemonIcon';
 import { usePopupListener } from '../hooks/usePopupListener';
 import './PokedexHome.css';
 
-/** The home grid: one clickable icon per met species. Clicking a species
- *  opens its PokedexView detail page. */
+/** The home grid: one clickable icon per indexed species. Clicking a
+ *  species opens its PokedexView detail page. */
 export function PokedexHome({ onOpen }: { onOpen: (row: PokedexRow) => void }) {
   const [rows, setRows] = useState<PokedexRow[] | null>(null);
   const [failed, setFailed] = useState(false);
@@ -26,11 +26,11 @@ export function PokedexHome({ onOpen }: { onOpen: (row: PokedexRow) => void }) {
     void load();
   }, []);
 
-  // While the home page is up, a species' first find elsewhere (another
+  // While the home page is up, a species' first row elsewhere (another
   // tab's sprite) broadcasts its dex id — light the cell in place. The 151
   // species (names, descriptions) are already in `rows`, so no refetch is
-  // needed. (The home rows carry no discovery data; the entry page fetches
-  // it when opened.)
+  // needed. (The home rows carry no acquisition data; the entry page
+  // fetches it when opened.)
   usePopupListener((message) => {
     switch (message.type) {
       case 'pokedex-entry-added': {
@@ -39,7 +39,7 @@ export function PokedexHome({ onOpen }: { onOpen: (row: PokedexRow) => void }) {
           current === null
             ? current
             : current.map((row) =>
-                row.dexId === dexId ? { ...row, met: true } : row,
+                row.dexId === dexId ? { ...row, indexed: true } : row,
               ),
         );
         break;
@@ -58,20 +58,20 @@ export function PokedexHome({ onOpen }: { onOpen: (row: PokedexRow) => void }) {
     );
   }
 
-  // Only found species earn a slot; the count header still shows the full
+  // Only indexed species earn a slot; the count header still shows the full
   // progress toward the 151.
-  const met = rows === null ? [] : rows.filter((row) => row.met);
+  const indexed = rows === null ? [] : rows.filter((row) => row.indexed);
 
   return (
     <div className="view">
       <p className="index-count">
         {rows === null
           ? 'Opening the index…'
-          : `${met.length} / 151 discovered`}
+          : `${indexed.length} / 151 discovered`}
       </p>
-      {rows !== null && met.length > 0 && (
+      {rows !== null && indexed.length > 0 && (
         <div className="index-grid">
-          {met.map((row) => (
+          {indexed.map((row) => (
             <button
               key={row.dexId}
               type="button"

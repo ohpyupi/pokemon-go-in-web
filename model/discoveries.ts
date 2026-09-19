@@ -8,7 +8,8 @@
  */
 
 import Dexie, { type Table } from 'dexie';
-import { type Discovery, db } from './db';
+import { db } from './db';
+import type { Discovery } from './types';
 
 /** A species' timeline never grows past this many domains. Once it is
  *  full, later finds are not recorded — the first ones stay. */

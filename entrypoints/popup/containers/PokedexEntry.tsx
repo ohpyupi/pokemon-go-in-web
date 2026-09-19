@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Discovery } from '@/model/db';
+import type { Acquisition } from '@/model/types';
 import type { PokedexRow } from '@/model/pokedex';
 import { sendRequestToBackground } from '@/utils/messages';
 import { PokemonIcon } from '../components/PokemonIcon';
@@ -8,17 +8,17 @@ import './PokedexEntry.css';
 
 /** One Pokédex entry, opened from the home grid: a species' full record —
  *  name, modern types, size, and where it has been found. The static
- *  fields ride along with the home row; the discovery history is fetched
- *  lazily per species (the home rows never carry it). */
+ *  fields ride along with the home row; the acquisition rows are fetched
+ *  lazily per species (the home rows never carry them). */
 export function PokedexEntry({ row }: { row: PokedexRow }) {
   /** null = not read yet — the section stays hidden until the read lands. */
-  const [foundOn, setFoundOn] = useState<Discovery[] | null>(null);
+  const [rows, setRows] = useState<Acquisition[] | null>(null);
 
   useEffect(() => {
     // The history is a nice-to-have: a failed read simply leaves the
     // section hidden — no loading or error UI on this page.
-    void sendRequestToBackground({ type: 'get-discoveries', dexId: row.dexId })
-      .then((reply) => setFoundOn(reply.discoveries))
+    void sendRequestToBackground({ type: 'get-acquisitions', dexId: row.dexId })
+      .then((reply) => setRows(reply.acquisitions))
       .catch(() => {});
   }, [row.dexId]);
 
@@ -33,8 +33,11 @@ export function PokedexEntry({ row }: { row: PokedexRow }) {
 
   /** The list is oldest first, so the first row is the origin story: it
    *  keeps the full date and time; later finds show the date only. */
-  const foundWhen = (found: Discovery): string =>
-    new Date(found.foundAt).toLocaleString();
+  const foundWhen = (acquiredAt: number): string =>
+    new Date(acquiredAt).toLocaleString();
+
+  // Only found rows are rendered so far — shared rows arrive with the gift.
+  const foundRows = rows?.filter((row) => row.kind === 'found') ?? null;
 
   return (
     <div className="view view--center">
@@ -56,13 +59,13 @@ export function PokedexEntry({ row }: { row: PokedexRow }) {
         </div>
         <p className="meta-desc">{row.description}</p>
       </div>
-      {foundOn !== null && foundOn.length > 0 && (
+      {foundRows !== null && foundRows.length > 0 && (
         <div className="found">
-          <p className="found-title">Found on ({foundOn.length})</p>
-          {foundOn.map((found) => (
-            <p className="found-row" key={found.foundOn}>
+          <p className="found-title">Found on ({foundRows.length})</p>
+          {foundRows.map((found) => (
+            <p className="found-row" key={found.id}>
               <span className="found-domain">{found.foundOn}</span>
-              <span className="found-when">{foundWhen(found)}</span>
+              <span className="found-when">{foundWhen(found.acquiredAt)}</span>
             </p>
           ))}
         </div>

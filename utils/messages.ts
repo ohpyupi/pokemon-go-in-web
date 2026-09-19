@@ -11,7 +11,7 @@
  * change — together.
  */
 
-import type { Discovery } from '@/model/db';
+import type { Acquisition } from '@/model/types';
 import type { PokedexRow } from '@/model/pokedex';
 
 /** One answered message: what the sender sends, and the typed reply. */
@@ -20,14 +20,14 @@ type RequestRow<Request, Reply> = { request: Request; reply: Reply };
 /** Answered requests, grouped by who receives and answers them. */
 type RequestProtocol = {
   background: {
-    // popup: the whole index — all 151 species + met state. Light by
-    // design: a species' discovery history rides its own message below.
+    // popup: the whole index — all 151 species + indexed state. Light by
+    // design: a species' rows ride their own message below.
     'get-pokedex-data': RequestRow<{}, { rows: PokedexRow[] }>;
-    // popup: one species' discovery history — every domain it was found
-    // on, oldest first. The entry page fetches it lazily when opened.
-    'get-discoveries': RequestRow<
+    // popup: one species' acquisition rows, oldest first. The entry page
+    // fetches them lazily when opened.
+    'get-acquisitions': RequestRow<
       { dexId: number },
-      { discoveries: Discovery[] }
+      { acquisitions: Acquisition[] }
     >;
     // content script: which page is the player on right now?
     'get-encounter': RequestRow<
@@ -47,9 +47,9 @@ type EventProtocol = {
     destroy: {}; // profile erased: remove the sprite
   };
   popup: {
-    // a species' very first find: the popup lights its cell instead of
-    // refetching. A known species found on a new domain only changes its
-    // entry page, which fetches on open — no broadcast needed.
+    // a species' very first row: the popup lights its cell instead of
+    // refetching. A species that already has rows gaining one more only
+    // changes its entry page, which fetches on open — no broadcast needed.
     'pokedex-entry-added': { dexId: number };
   };
 };
@@ -83,7 +83,7 @@ export function isBackgroundMessage(
     message,
     'get-encounter',
     'get-pokedex-data',
-    'get-discoveries',
+    'get-acquisitions',
   );
 }
 

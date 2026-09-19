@@ -1,4 +1,4 @@
-import { discoveries } from '@/model/discoveries';
+import { acquisitions } from '@/model/acquisitions';
 import { pokedex } from '@/model/pokedex';
 import { loadProfile, TRAINER_KEY } from '@/model/trainer';
 import { dexIdFrom, isBlockedHost, registrableDomain } from '@/utils/encounter';
@@ -23,11 +23,14 @@ export default defineBackground(() => {
         // are one place in the wild — one domain, one Pokémon.
         const domain = registrableDomain(message.hostname);
         const dexId = dexIdFrom(profile, domain);
-        const found = await discoveries.discover(dexId, domain);
-        if (found?.newSpecies) {
-          // A species entered the dex for the first time — light it up in
-          // the open popup. A known species found on a new domain only
-          // changes its entry page, which fetches when opened: no broadcast.
+        const found = await acquisitions.add(dexId, {
+          kind: 'found',
+          foundOn: domain,
+        });
+        if (found?.newEntry) {
+          // This Pokémon had no rows before this one — light it up in the
+          // open popup. An indexed species gaining another row only changes
+          // its entry page, which fetches when opened: no broadcast.
           await sendEventToPopup({ type: 'pokedex-entry-added', dexId });
         }
         return { dexId };
@@ -36,10 +39,10 @@ export default defineBackground(() => {
         // The popup (the Pokédex view) reads the model through here —
         // Dexie never leaves the background.
         return { rows: await pokedex.getAll() };
-      case 'get-discoveries':
-        // One species' findings, read only when its entry page opens — the
-        // home rows never carry discovery data.
-        return { discoveries: await discoveries.getAllByDexId(message.dexId) };
+      case 'get-acquisitions':
+        // One species' rows, read only when its entry page opens — the home
+        // rows never carry them.
+        return { acquisitions: await acquisitions.getAllByDexId(message.dexId) };
     }
   });
 
@@ -56,7 +59,7 @@ export default defineBackground(() => {
       change.newValue ? { type: 'spawn' } : { type: 'destroy' },
     );
     if (!change.newValue) {
-      await discoveries.removeAll(); // no trainer → no adventure → no finds
+      await acquisitions.removeAll(); // no trainer → no adventure → no rows
     }
   });
 });
