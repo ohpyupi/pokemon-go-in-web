@@ -6,10 +6,6 @@ import { PokemonIcon } from '../components/PokemonIcon';
 import { PokemonTypeChip } from '../components/PokemonTypeChip';
 import './PokedexEntry.css';
 
-/** One Pokédex entry, opened from the home grid: a species' full record —
- *  name, modern types, size, and where it has been found. The static
- *  fields ride along with the home row; the acquisition rows are fetched
- *  lazily per species (the home rows never carry them). */
 export function PokedexEntry({ row }: { row: PokedexRow }) {
   /** null = not read yet — the section stays hidden until the read lands. */
   const [rows, setRows] = useState<Acquisition[] | null>(null);
@@ -31,13 +27,22 @@ export function PokedexEntry({ row }: { row: PokedexRow }) {
     <PokemonTypeChip key={type} type={type} />
   ));
 
-  /** The list is oldest first, so the first row is the origin story: it
-   *  keeps the full date and time; later finds show the date only. */
-  const foundWhen = (acquiredAt: number): string =>
-    new Date(acquiredAt).toLocaleString();
+  const kind = (acquisition: Acquisition): string =>
+    acquisition.kind === 'found' ? 'Found' : 'Shared';
 
-  // Only found rows are rendered so far — shared rows arrive with the gift.
-  const foundRows = rows?.filter((row) => row.kind === 'found') ?? null;
+  const source = (acquisition: Acquisition): string =>
+    acquisition.kind === 'found'
+      ? acquisition.foundOn
+      : acquisition.sharedBy;
+
+  const when = (acquiredAt: number): string =>
+    new Date(acquiredAt).toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+    });
 
   return (
     <div className="view view--center">
@@ -59,13 +64,14 @@ export function PokedexEntry({ row }: { row: PokedexRow }) {
         </div>
         <p className="meta-desc">{row.description}</p>
       </div>
-      {foundRows !== null && foundRows.length > 0 && (
-        <div className="found">
-          <p className="found-title">Found on ({foundRows.length})</p>
-          {foundRows.map((found) => (
-            <p className="found-row" key={found.id}>
-              <span className="found-domain">{found.foundOn}</span>
-              <span className="found-when">{foundWhen(found.acquiredAt)}</span>
+      {rows !== null && rows.length > 0 && (
+        <div className="history">
+          <p className="history-title">History ({rows.length})</p>
+          {rows.map((acquisition) => (
+            <p className="history-row" key={acquisition.id}>
+              <span className="history-kind">{kind(acquisition)}</span>
+              <span className="history-source">{source(acquisition)}</span>
+              <span className="history-when">{when(acquisition.acquiredAt)}</span>
             </p>
           ))}
         </div>
