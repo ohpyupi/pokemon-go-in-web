@@ -15,6 +15,7 @@ import './App.css';
 
 /** The extension version, straight from the manifest. */
 const VERSION = browser.runtime.getManifest().version;
+const RELEASES = 'https://github.com/ohpyupi/pokemon-go-in-web/releases/tag';
 
 const TABS = ['pokedex', 'trainer', 'receive', 'friends'] as const;
 
@@ -117,7 +118,16 @@ export function App() {
           )}
         </div>
       )}
-      <p className="version">v{VERSION}</p>
+      <p className="version">
+        <a
+          className="version-link"
+          href={`${RELEASES}/v${VERSION}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          v{VERSION}
+        </a>
+      </p>
     </main>
   );
 }
