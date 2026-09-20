@@ -4,67 +4,40 @@ import { sendRequestToBackground } from '@/utils/messages';
 import { Modal } from '../components/Modal';
 import './Friends.css';
 
-/** The Friends page: my address and the friends I can send to. */
-export function Friends({ address }: { address: string | null }) {
-  const [friends, setFriends] = useState<Friend[]>([]);
+export function Friends({ friends }: { friends: Record<string, Friend> }) {
   const [addOpen, setAddOpen] = useState(false);
   const [friendAddress, setFriendAddress] = useState('');
   const [nickname, setNickname] = useState('');
-  const [copied, setCopied] = useState(false);
+
+  const list = Object.values(friends);
 
   const closeAdd = (): void => setAddOpen(false);
-
-  const generateAddress = (): void => {
-    void sendRequestToBackground({ type: 'generate-address' });
-  };
-
-  const copyAddress = async (): Promise<void> => {
-    if (address === null) return;
-    await navigator.clipboard.writeText(address);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
 
   const addFriend = (event: FormEvent): void => {
     event.preventDefault();
     const added = friendAddress.trim();
-    if (friends.some((friend) => friend.address === added)) return;
-    setFriends([...friends, { address: added, nickname: nickname.trim() }]);
+    if (friends[added] !== undefined) return;
+    void sendRequestToBackground({
+      type: 'add-friend',
+      address: added,
+      nickname: nickname.trim(),
+    });
     setFriendAddress('');
     setNickname('');
     closeAdd();
   };
 
   const removeFriend = (friend: Friend): void => {
-    setFriends(friends.filter((other) => other.address !== friend.address));
+    void sendRequestToBackground({
+      type: 'remove-friend',
+      address: friend.address,
+    });
   };
 
   const canAdd = friendAddress.trim() !== '' && nickname.trim() !== '';
 
   return (
     <div className="view">
-      <div className="friends-block my-address">
-        <p className="friends-title">My address</p>
-        {!address ? (
-          <>
-            <p className="friends-hint">
-              Send this address to a friend, and they can gift you Pokémon.
-            </p>
-            <button type="button" className="cta" onClick={generateAddress}>
-              Generate address
-            </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            className="copy-address"
-            onClick={() => void copyAddress()}
-          >
-            {address}
-          </button>
-        )}
-      </div>
-
       {addOpen && (
         <Modal title="Add a friend" onClose={closeAdd}>
           <form onSubmit={addFriend}>
@@ -95,15 +68,17 @@ export function Friends({ address }: { address: string | null }) {
       )}
 
       <div className="friends-block">
-        <p className="friends-title">Friends ({friends.length})</p>
         <button type="button" className="cta" onClick={() => setAddOpen(true)}>
           Add a friend
         </button>
-        {friends.length === 0 ? (
-          <p className="friends-hint">No friends yet.</p>
+        <p className="friends-title">Friends ({list.length})</p>
+        {list.length === 0 ? (
+          <p className="friends-hint">
+            No friends yet. Add friends to share your Pokémon with them.
+          </p>
         ) : (
           <div className="friend-list">
-            {friends.map((friend) => (
+            {list.map((friend) => (
               <div className="friend" key={friend.address}>
                 <p className="friend-head">
                   <span className="friend-nickname">{friend.nickname}</span>
@@ -121,10 +96,6 @@ export function Friends({ address }: { address: string | null }) {
           </div>
         )}
       </div>
-
-      <p className={`toast ${copied ? 'show' : ''}`} role="status">
-        Address copied
-      </p>
     </div>
   );
 }

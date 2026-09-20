@@ -1,4 +1,4 @@
-import { addressOf, createKeys, type KeyPair } from '@/utils/keys';
+import { createAddress, createKeys, type KeyPair } from '@/utils/keys';
 
 export type Gender = 'boy' | 'girl';
 
@@ -39,9 +39,24 @@ export class TrainerRepository {
     if (stored.keys === undefined) {
       const keys = await createKeys();
       stored.keys = keys;
-      stored.address = await addressOf(keys.publicKey);
+      stored.address = await createAddress(keys.publicKey);
       await browser.storage.local.set({ [TRAINER_KEY]: stored });
     }
+    return publicPart(stored);
+  }
+
+  /** The stored pair. Background only — it must never ride a message. */
+  async getKeys(): Promise<KeyPair | null> {
+    const stored = await this.read();
+    return stored?.keys ?? null;
+  }
+
+  async removeKeys(): Promise<TrainerData | null> {
+    const stored = await this.read();
+    if (stored === null) return null;
+    delete stored.keys;
+    stored.address = null;
+    await browser.storage.local.set({ [TRAINER_KEY]: stored });
     return publicPart(stored);
   }
 

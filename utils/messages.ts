@@ -11,7 +11,7 @@
  * change — together.
  */
 
-import type { Acquisition } from '@/model/types';
+import type { Acquisition, Friend } from '@/model/types';
 import type { PokedexRow } from '@/model/pokedex';
 import type { TrainerData } from '@/model/trainer';
 
@@ -39,6 +39,15 @@ type RequestProtocol = {
     'register-trainer': RequestRow<TrainerData, {}>;
     'reset-trainer': RequestRow<{}, {}>;
     'generate-address': RequestRow<{}, {}>;
+    'remove-address': RequestRow<{}, {}>;
+    'get-friends': RequestRow<{}, { friends: Friend[] }>;
+    'add-friend': RequestRow<{ address: string; nickname: string }, {}>;
+    'remove-friend': RequestRow<{ address: string }, {}>;
+    'create-share-code': RequestRow<
+      { address: string; dexId: number },
+      { code: string | null }
+    >;
+    'open-share-code': RequestRow<{ code: string }, { dexId: number | null }>;
   };
   content: {
     // future: the background asks a content script, the content answers
@@ -57,6 +66,10 @@ type EventProtocol = {
     // changes its entry page, which fetches on open — no broadcast needed.
     'pokedex-entry-added': { dexId: number };
     'profile-changed': { profile: TrainerData | null };
+    'friend-changed':
+      | { op: 'add'; friend: Friend }
+      | { op: 'update'; friend: Friend }
+      | { op: 'remove'; address: string };
   };
 };
 
@@ -94,6 +107,12 @@ export function isBackgroundMessage(
     'register-trainer',
     'reset-trainer',
     'generate-address',
+    'remove-address',
+    'get-friends',
+    'add-friend',
+    'remove-friend',
+    'create-share-code',
+    'open-share-code',
   );
 }
 
@@ -104,7 +123,12 @@ export function isContentMessage(message: unknown): message is ContentMessage {
 
 /** True when `message` is one the popup must handle. */
 export function isPopupMessage(message: unknown): message is PopupMessage {
-  return isOneOf(message, 'pokedex-entry-added', 'profile-changed');
+  return isOneOf(
+    message,
+    'pokedex-entry-added',
+    'profile-changed',
+    'friend-changed',
+  );
 }
 
 /** Send a request to the background, get its typed reply. The one cast in

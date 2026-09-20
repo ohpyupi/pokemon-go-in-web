@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { PokedexRow } from '@/model/pokedex';
 import type { TrainerData } from '@/model/trainer';
+import type { Friend } from '@/model/types';
 import { sendRequestToBackground } from '@/utils/messages';
 import { NavBar } from './components/NavBar';
 import { Friends } from './containers/Friends';
@@ -30,15 +31,38 @@ export function App() {
   const [page, setPage] = useState<Page>('pokedex');
   /** The species opened from the home grid — rendered on the entry page. */
   const [entry, setEntry] = useState<PokedexRow | null>(null);
+  const [friends, setFriends] = useState<Record<string, Friend>>({});
 
   useEffect(() => {
-    void sendRequestToBackground({ type: 'get-profile' }).then((reply) =>
-      setProfile(reply.profile),
-    );
+    void (async () => {
+      const [profileReply, friendsReply] = await Promise.all([
+        sendRequestToBackground({ type: 'get-profile' }),
+        sendRequestToBackground({ type: 'get-friends' }),
+      ]);
+      setProfile(profileReply.profile);
+      setFriends(
+        Object.fromEntries(
+          friendsReply.friends.map((friend) => [friend.address, friend]),
+        ),
+      );
+    })();
   }, []);
 
   usePopupListener((message) => {
     if (message.type === 'profile-changed') setProfile(message.profile);
+    if (message.type === 'friend-changed') {
+      if (message.op === 'remove') {
+        const { address } = message;
+        setFriends((prev) => {
+          const next = { ...prev };
+          delete next[address];
+          return next;
+        });
+      } else {
+        const { friend } = message;
+        setFriends((prev) => ({ ...prev, [friend.address]: friend }));
+      }
+    }
   });
 
   if (profile === undefined) {
@@ -70,7 +94,7 @@ export function App() {
       {profile === null ? (
         <Registration onRegister={register} />
       ) : page === 'pokedex-entry' && entry !== null ? (
-        <PokedexEntry row={entry} />
+        <PokedexEntry row={entry} friends={friends} />
       ) : (
         <div className="device">
           <nav className="tabs">
@@ -86,8 +110,8 @@ export function App() {
             ))}
           </nav>
           {page === 'pokedex' && <PokedexHome onOpen={openEntry} />}
-          {page === 'friends' && <Friends address={profile.address} />}
-          {page === 'receive' && <Receive />}
+          {page === 'friends' && <Friends friends={friends} />}
+          {page === 'receive' && <Receive address={profile.address} />}
           {page === 'trainer' && (
             <Trainer profile={profile} onReset={() => void reset()} />
           )}

@@ -1,5 +1,7 @@
 import { acquisitions } from '@/model/acquisitions';
+import { friends } from '@/model/friends';
 import { pokedex } from '@/model/pokedex';
+import { pokemon } from '@/model/pokemon';
 import { trainer } from '@/model/trainer';
 import { dexIdFrom, isBlockedHost, registrableDomain } from '@/utils/encounter';
 import {
@@ -7,6 +9,7 @@ import {
   sendEventToContent,
   sendEventToPopup,
 } from '@/utils/messages';
+import { createShareCode, openShareCode } from '@/utils/share';
 
 export default defineBackground(() => {
   // The controller: every model read/write from the views lands here.
@@ -67,6 +70,56 @@ export default defineBackground(() => {
           profile: await trainer.generateKeys(),
         });
         return {};
+      }
+      case 'remove-address': {
+        await sendEventToPopup({
+          type: 'profile-changed',
+          profile: await trainer.removeKeys(),
+        });
+        return {};
+      }
+      case 'get-friends':
+        return { friends: await friends.getAll() };
+      case 'add-friend': {
+        const friend = await friends.add(message.address, message.nickname);
+        await sendEventToPopup({ type: 'friend-changed', op: 'add', friend });
+        return {};
+      }
+      case 'remove-friend': {
+        await friends.remove(message.address);
+        await sendEventToPopup({
+          type: 'friend-changed',
+          op: 'remove',
+          address: message.address,
+        });
+        return {};
+      }
+      case 'create-share-code': {
+        const profile = await trainer.get();
+        if (profile === null) return { code: null };
+        const code = await createShareCode(message.address, {
+          dexId: message.dexId,
+          name: profile.name,
+        });
+        return { code };
+      }
+      case 'open-share-code': {
+        const keys = await trainer.getKeys();
+        if (keys === null) return { dexId: null };
+        const payload = await openShareCode(message.code, keys);
+        if (payload === null) return { dexId: null };
+        const { dexId, name } = payload;
+        // The code is unsigned, so anyone may seal one to my address: the
+        // catalog decides whether this species exists.
+        if ((await pokemon.get(dexId)) === undefined) return { dexId: null };
+        const shared = await acquisitions.add(dexId, {
+          kind: 'shared',
+          sharedBy: name,
+        });
+        if (shared?.newEntry) {
+          await sendEventToPopup({ type: 'pokedex-entry-added', dexId });
+        }
+        return { dexId };
       }
     }
   });

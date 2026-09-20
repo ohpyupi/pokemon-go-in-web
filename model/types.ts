@@ -73,4 +73,5 @@ export type Acquisition = FoundAcquisition | SharedAcquisition;
 export interface Friend {
   address: string;
   nickname: string;
+  addedAt: number;
 }
