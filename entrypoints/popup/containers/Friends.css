@@ -20,7 +20,7 @@
   margin-bottom: 12px;
 }
 
-.my-address button {
+.my-address .copy-address {
   box-sizing: border-box;
   display: block;
   width: 100%;
@@ -39,7 +39,7 @@
   transition: border-color 0.15s;
 }
 
-.my-address:hover {
+.my-address .copy-address:hover {
   border-color: var(--red);
 }
 
@@ -67,10 +67,6 @@
 
 .friend {
   padding: 8px;
-}
-
-.friend + .friend {
-  border-top: 1px solid var(--line);
 }
 
 .friend-head {

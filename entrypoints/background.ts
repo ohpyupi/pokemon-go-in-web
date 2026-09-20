@@ -1,6 +1,6 @@
 import { acquisitions } from '@/model/acquisitions';
 import { pokedex } from '@/model/pokedex';
-import { loadProfile, TRAINER_KEY } from '@/model/trainer';
+import { trainer } from '@/model/trainer';
 import { dexIdFrom, isBlockedHost, registrableDomain } from '@/utils/encounter';
 import {
   isBackgroundMessage,
@@ -17,7 +17,7 @@ export default defineBackground(() => {
         // dexId = f(trainer seed, hostname): deterministic per trainer ×
         // page. No trainer profile yet, or a blacklisted (dev/internal)
         // host → no encounter (register in the popup first).
-        const profile = await loadProfile();
+        const profile = await trainer.get();
         if (!profile || isBlockedHost(message.hostname)) return { dexId: null };
         // Subdomains don't matter: chat.deepseek.com and platform.deepseek.com
         // are one place in the wild — one domain, one Pokémon.
@@ -43,23 +43,31 @@ export default defineBackground(() => {
         // One species' rows, read only when its entry page opens — the home
         // rows never carry them.
         return { acquisitions: await acquisitions.getAllByDexId(message.dexId) };
-    }
-  });
-
-  // The trainer profile is the world's seed. When it is cleared ("New
-  // game") every page's sprite must die — and the wild log with it, since
-  // both belong to the trainer. When it is (re)created (registration)
-  // every page re-resolves its encounter against the new seed. The popup
-  // only writes storage — the background reacts, so no extra hops.
-  browser.storage.onChanged.addListener(async (changes, areaName) => {
-    if (areaName !== 'local') return;
-    const change = changes[TRAINER_KEY];
-    if (!change) return;
-    await sendEventToContent(
-      change.newValue ? { type: 'spawn' } : { type: 'destroy' },
-    );
-    if (!change.newValue) {
-      await acquisitions.removeAll(); // no trainer → no adventure → no rows
+      case 'get-profile':
+        return { profile: await trainer.get() };
+      case 'register-trainer': {
+        await trainer.create(message);
+        await sendEventToContent({ type: 'spawn' });
+        await sendEventToPopup({
+          type: 'profile-changed',
+          profile: await trainer.get(),
+        });
+        return {};
+      }
+      case 'reset-trainer': {
+        await trainer.remove();
+        await acquisitions.removeAll();
+        await sendEventToContent({ type: 'destroy' });
+        await sendEventToPopup({ type: 'profile-changed', profile: null });
+        return {};
+      }
+      case 'generate-address': {
+        await sendEventToPopup({
+          type: 'profile-changed',
+          profile: await trainer.generateKeys(),
+        });
+        return {};
+      }
     }
   });
 });

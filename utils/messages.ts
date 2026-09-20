@@ -13,6 +13,7 @@
 
 import type { Acquisition } from '@/model/types';
 import type { PokedexRow } from '@/model/pokedex';
+import type { TrainerData } from '@/model/trainer';
 
 /** One answered message: what the sender sends, and the typed reply. */
 type RequestRow<Request, Reply> = { request: Request; reply: Reply };
@@ -34,6 +35,10 @@ type RequestProtocol = {
       { hostname: string },
       { dexId: number | null } // or null when there is no encounter on that page
     >;
+    'get-profile': RequestRow<{}, { profile: TrainerData | null }>;
+    'register-trainer': RequestRow<TrainerData, {}>;
+    'reset-trainer': RequestRow<{}, {}>;
+    'generate-address': RequestRow<{}, {}>;
   };
   content: {
     // future: the background asks a content script, the content answers
@@ -51,6 +56,7 @@ type EventProtocol = {
     // refetching. A species that already has rows gaining one more only
     // changes its entry page, which fetches on open — no broadcast needed.
     'pokedex-entry-added': { dexId: number };
+    'profile-changed': { profile: TrainerData | null };
   };
 };
 
@@ -84,6 +90,10 @@ export function isBackgroundMessage(
     'get-encounter',
     'get-pokedex-data',
     'get-acquisitions',
+    'get-profile',
+    'register-trainer',
+    'reset-trainer',
+    'generate-address',
   );
 }
 
@@ -94,7 +104,7 @@ export function isContentMessage(message: unknown): message is ContentMessage {
 
 /** True when `message` is one the popup must handle. */
 export function isPopupMessage(message: unknown): message is PopupMessage {
-  return isOneOf(message, 'pokedex-entry-added');
+  return isOneOf(message, 'pokedex-entry-added', 'profile-changed');
 }
 
 /** Send a request to the background, get its typed reply. The one cast in

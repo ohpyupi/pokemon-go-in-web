@@ -12,8 +12,6 @@ export function Friends({ address }: { address: string | null }) {
   const [nickname, setNickname] = useState('');
   const [copied, setCopied] = useState(false);
 
-  console.log(address)
-
   const closeAdd = (): void => setAddOpen(false);
 
   const generateAddress = (): void => {
@@ -59,6 +57,7 @@ export function Friends({ address }: { address: string | null }) {
         ) : (
           <button
             type="button"
+            className="copy-address"
             onClick={() => void copyAddress()}
           >
             {address}

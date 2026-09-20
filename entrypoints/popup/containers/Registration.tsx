@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react';
-import type { Gender, TrainerProfile } from '@/model/trainer';
+import type { Gender, TrainerData } from '@/model/trainer';
 import './Registration.css';
 
 const NAME_MAX = 12; // classic game limit
@@ -8,7 +8,7 @@ const NAME_MAX = 12; // classic game limit
 export function Registration({
   onRegister,
 }: {
-  onRegister: (trainer: TrainerProfile) => Promise<void>;
+  onRegister: (trainer: TrainerData) => Promise<void>;
 }) {
   const [name, setName] = useState('');
   const [gender, setGender] = useState<Gender | null>(null);
@@ -33,7 +33,12 @@ export function Registration({
       setError(null);
       // The current time is the third seed ingredient — captured here,
       // at the moment the adventure begins.
-      await onRegister({ name: trimmed, gender, startedAt: Date.now() });
+      await onRegister({
+        name: trimmed,
+        gender,
+        startedAt: Date.now(),
+        address: null,
+      });
     } catch {
       setError('Could not save your trainer. Please try again.');
     }
@@ -41,7 +46,7 @@ export function Registration({
 
   return (
     <form className="view" onSubmit={(e) => void submit(e)}>
-      <h1>Welcome, Trainer!</h1>
+      <h1 className="registration-title">Welcome, Trainer!</h1>
 
       <label className="field" htmlFor="trainer-name">
         What is your name?
