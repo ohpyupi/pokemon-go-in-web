@@ -20,11 +20,12 @@
 
 import Dexie, { type Table } from 'dexie';
 import { SPECIES } from './seed/species';
-import type { Acquisition, Discovery, Pokemon } from './types';
+import type { Acquisition, Discovery, Friend, Pokemon } from './types';
 
 class DexDB extends Dexie {
   pokemon!: Table<Pokemon, number>;
   acquisitions!: Table<Acquisition, string>;
+  friends!: Table<Friend, string>;
   /** @deprecated TODO: drop in v3 — read `acquisitions` instead. */
   discoveries!: Table<Discovery, [number, string]>;
 
@@ -54,6 +55,7 @@ class DexDB extends Dexie {
       .stores({
         acquisitions:
           'id, dexId, kind, foundOn, sharedBy, &[dexId+foundOn], &[dexId+sharedBy]',
+        friends: 'address, addedAt',
       })
       .upgrade(async (tx) => {
         // Every old row is a wild find, so the copy is a straight rename.

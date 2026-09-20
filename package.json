@@ -24,7 +24,8 @@
     "format": "biome check --write .",
     "postinstall": "wxt prepare",
     "build:pokemon-sprites-icon": "node scripts/download-icons.ts",
-    "seed:species": "node scripts/fetch-species.ts"
+    "seed:species": "node scripts/fetch-species.ts",
+    "make:share-code": "node scripts/make-share-code.ts"
   },
   "dependencies": {
     "dexie": "^4.4.5",
