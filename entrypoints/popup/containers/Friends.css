@@ -1,0 +1,92 @@
+.friends-block .cta {
+  margin-bottom: 16px;
+}
+
+.friends-title {
+  margin: 0 0 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.friends-hint {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.my-address {
+  margin-bottom: 12px;
+}
+
+.my-address button {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--chip-bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.my-address:hover {
+  border-color: var(--red);
+}
+
+.friends-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #9aa0a8;
+  font: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.friends-link:hover {
+  color: var(--red);
+}
+
+.friend-list {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  text-align: left;
+}
+
+.friend {
+  padding: 8px;
+}
+
+.friend + .friend {
+  border-top: 1px solid var(--line);
+}
+
+.friend-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.friend-nickname {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.friend-address {
+  color: var(--text-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
