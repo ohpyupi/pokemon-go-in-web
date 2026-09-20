@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { Acquisition, Friend } from '@/model/types';
 import type { PokedexRow } from '@/model/pokedex';
+import type { Acquisition, Friend } from '@/model/types';
 import { sendRequestToBackground } from '@/utils/messages';
 import { Modal } from '../components/Modal';
 import { PokemonIcon } from '../components/PokemonIcon';
@@ -64,9 +64,7 @@ export function PokedexEntry({
     acquisition.kind === 'found' ? 'Found' : 'Shared';
 
   const source = (acquisition: Acquisition): string =>
-    acquisition.kind === 'found'
-      ? acquisition.foundOn
-      : acquisition.sharedBy;
+    acquisition.kind === 'found' ? acquisition.foundOn : acquisition.sharedBy;
 
   const when = (acquiredAt: number): string =>
     new Date(acquiredAt).toLocaleString(undefined, {
@@ -115,7 +113,9 @@ export function PokedexEntry({
             <p className="history-row" key={acquisition.id}>
               <span className="history-kind">{kind(acquisition)}</span>
               <span className="history-source">{source(acquisition)}</span>
-              <span className="history-when">{when(acquisition.acquiredAt)}</span>
+              <span className="history-when">
+                {when(acquisition.acquiredAt)}
+              </span>
             </p>
           ))}
         </div>

@@ -24,11 +24,10 @@ export function fromBase64Url(text: string): Uint8Array<ArrayBuffer> | null {
 
 export async function createKeys(): Promise<KeyPair> {
   // X25519 always generates a pair; the DOM lib types the result loosely.
-  const pair = (await crypto.subtle.generateKey(
-    { name: 'X25519' },
-    true,
-    ['deriveKey', 'deriveBits'],
-  )) as CryptoKeyPair;
+  const pair = (await crypto.subtle.generateKey({ name: 'X25519' }, true, [
+    'deriveKey',
+    'deriveBits',
+  ])) as CryptoKeyPair;
   const [publicRaw, privateJwk] = await Promise.all([
     crypto.subtle.exportKey('raw', pair.publicKey),
     crypto.subtle.exportKey('jwk', pair.privateKey),
@@ -52,7 +51,9 @@ export function importPrivateKey(pair: KeyPair): Promise<CryptoKey> {
   );
 }
 
-export function importPublicKey(raw: Uint8Array<ArrayBuffer>): Promise<CryptoKey> {
+export function importPublicKey(
+  raw: Uint8Array<ArrayBuffer>,
+): Promise<CryptoKey> {
   return crypto.subtle.importKey('raw', raw, { name: 'X25519' }, false, []);
 }
 

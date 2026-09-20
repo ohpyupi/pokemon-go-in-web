@@ -3,9 +3,9 @@ import {
   fromBase64Url,
   importPrivateKey,
   importPublicKey,
+  type KeyPair,
   parseAddress,
   toBase64Url,
-  type KeyPair,
 } from './keys';
 
 export interface SharePayload {
@@ -24,11 +24,10 @@ export async function createShareCode(
 ): Promise<string | null> {
   const raw = await parseAddress(address);
   if (raw === null) return null;
-  const pair = (await crypto.subtle.generateKey(
-    { name: 'X25519' },
-    true,
-    ['deriveKey', 'deriveBits'],
-  )) as CryptoKeyPair;
+  const pair = (await crypto.subtle.generateKey({ name: 'X25519' }, true, [
+    'deriveKey',
+    'deriveBits',
+  ])) as CryptoKeyPair;
   const key = await deriveKey(pair.privateKey, raw, 'encrypt');
   const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH));
   const plaintext = new TextEncoder().encode(JSON.stringify(payload));

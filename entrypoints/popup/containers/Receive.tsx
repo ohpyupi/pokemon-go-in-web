@@ -41,8 +41,8 @@ export function Receive({ address }: { address: string | null }) {
         {address === null ? (
           <>
             <p className="receive-hint">
-              Generate a new address, and share it with your friends to
-              receive their Pokémon.
+              Generate a new address, and share it with your friends to receive
+              their Pokémon.
             </p>
             <button type="button" className="cta" onClick={generateAddress}>
               Generate address

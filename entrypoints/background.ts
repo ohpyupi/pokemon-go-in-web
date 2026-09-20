@@ -45,7 +45,9 @@ export default defineBackground(() => {
       case 'get-acquisitions':
         // One species' rows, read only when its entry page opens — the home
         // rows never carry them.
-        return { acquisitions: await acquisitions.getAllByDexId(message.dexId) };
+        return {
+          acquisitions: await acquisitions.getAllByDexId(message.dexId),
+        };
       case 'get-profile':
         return { profile: await trainer.get() };
       case 'register-trainer': {

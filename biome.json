@@ -18,6 +18,9 @@
     "enabled": true,
     "rules": {
       "preset": "recommended",
+      "a11y": {
+        "useKeyWithClickEvents": "off"
+      },
       "correctness": {
         "useExhaustiveDependencies": "off"
       },

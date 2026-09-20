@@ -11,9 +11,9 @@
  * change — together.
  */
 
-import type { Acquisition, Friend } from '@/model/types';
 import type { PokedexRow } from '@/model/pokedex';
 import type { TrainerData } from '@/model/trainer';
+import type { Acquisition, Friend } from '@/model/types';
 
 /** One answered message: what the sender sends, and the typed reply. */
 type RequestRow<Request, Reply> = { request: Request; reply: Reply };

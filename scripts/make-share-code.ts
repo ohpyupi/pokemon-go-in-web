@@ -16,9 +16,7 @@ const SPKI_PREFIX = Buffer.from('302a300506032b656e032100', 'hex');
 
 const [address, dexIdText] = process.argv.slice(2);
 if (address === undefined || dexIdText === undefined) {
-  console.error(
-    'usage: node scripts/make-share-code.ts <address> <dexId>',
-  );
+  console.error('usage: node scripts/make-share-code.ts <address> <dexId>');
   process.exit(1);
 }
 
@@ -46,14 +44,18 @@ const secret = diffieHellman({
 });
 const iv = randomBytes(IV_LENGTH);
 const cipher = createCipheriv('aes-256-gcm', secret, iv);
-const payload = JSON.stringify({ dexId, name: "Sudoer" });
+const payload = JSON.stringify({ dexId, name: 'Sudoer' });
 const sealed = Buffer.concat([
   cipher.update(payload, 'utf8'),
   cipher.final(),
   cipher.getAuthTag(),
 ]);
 const ephemeral = pair.publicKey.export({ format: 'der', type: 'spki' });
-const body = Buffer.concat([ephemeral.subarray(SPKI_PREFIX.length), iv, sealed]);
+const body = Buffer.concat([
+  ephemeral.subarray(SPKI_PREFIX.length),
+  iv,
+  sealed,
+]);
 
 console.log(`${CODE_PREFIX}${body.toString('base64url')}`);
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import './Modal.css';
 
 /** A card over a dimmed page, for a task you finish and close. It opens when

@@ -6,9 +6,9 @@
  * a species' rows separately when it is opened.
  */
 
-import type { PokemonType } from './types';
 import { acquisitions } from './acquisitions';
 import { pokemon } from './pokemon';
+import type { PokemonType } from './types';
 
 /** The popup-facing alias of the type slugs (see types.ts). */
 export type { PokemonType };
