@@ -1,20 +1,20 @@
 /**
- * The Pokédex read model: the species catalog plus which species have been
- * met, joined into one ready-to-render row per species. The controller
+ * The Pokédex read model: the species catalog plus which species are
+ * indexed, joined into one ready-to-render row per species. The controller
  * relays these rows to the popup, so the view never joins anything itself.
- * Discovery history is not part of the home rows — the entry page fetches
- * a species' findings separately when it is opened.
+ * Acquisition rows are not part of the home rows — the entry page fetches
+ * a species' rows separately when it is opened.
  */
 
-import type { PokemonType } from './db';
-import { discoveries } from './discoveries';
+import { acquisitions } from './acquisitions';
 import { pokemon } from './pokemon';
+import type { PokemonType } from './types';
 
-/** The popup-facing alias of the type slugs (see db.ts). */
+/** The popup-facing alias of the type slugs (see types.ts). */
 export type { PokemonType };
 
 /** One Pokédex row: the species (name, description, modern types, size)
- *  plus its met state (false = never found anywhere yet). */
+ *  plus its indexed state (false = nothing gained yet). */
 export interface PokedexRow {
   dexId: number;
   name: string;
@@ -25,21 +25,21 @@ export interface PokedexRow {
   height: number;
   /** Weight in hectograms (PokeAPI raw unit). */
   weight: number;
-  /** True once the species was found on at least one domain. */
-  met: boolean;
+  /** True once any row exists for the species — found or shared. */
+  indexed: boolean;
 }
 
 /** The read model over the two tables — read-only, no writes. Everything
  *  outside the model goes through `pokedex` below and never touches Dexie
  *  directly. */
 export class PokedexRepository {
-  /** All 151 species in dex order with their met state. */
+  /** All 151 species in dex order with their indexed state. */
   async getAll(): Promise<PokedexRow[]> {
-    const [species, met] = await Promise.all([
+    const [species, indexedIds] = await Promise.all([
       pokemon.getAll(),
-      discoveries.knownSpecies(),
+      acquisitions.indexedDexIds(),
     ]);
-    const metDexIds = new Set(met);
+    const indexed = new Set(indexedIds);
     return species.map(
       ({ dexId, name, description, types, height, weight }) => ({
         dexId,
@@ -48,7 +48,7 @@ export class PokedexRepository {
         types,
         height,
         weight,
-        met: metDexIds.has(dexId),
+        indexed: indexed.has(dexId),
       }),
     );
   }

@@ -5,7 +5,8 @@
  */
 
 import type { Table } from 'dexie';
-import { db, type Pokemon } from './db';
+import { db } from './db';
+import type { Pokemon } from './types';
 
 /** One repository per table; everything outside the model goes through
  *  `pokemon` below and never touches Dexie directly. */

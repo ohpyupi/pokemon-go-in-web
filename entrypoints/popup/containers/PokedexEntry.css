@@ -11,8 +11,16 @@
   image-rendering: pixelated; /* the 32px art scaled up 3×, kept crisp */
 }
 
-.view-name {
+.view-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   margin-bottom: 8px;
+}
+
+.view-name {
   font-size: 20px;
   font-weight: 800;
 }
@@ -76,15 +84,15 @@
   line-height: 1.5;
 }
 
-/* The discovery section below the record card: its own heading and rows,
+/* The history section below the record card: its own heading and rows,
    unframed so it reads as a section, not a table. */
-.found {
+.history {
   width: 100%;
   margin-top: 12px;
   text-align: left;
 }
 
-.found-title {
+.history-title {
   margin: 0 0 4px;
   color: var(--text-muted);
   font-size: 12px;
@@ -92,9 +100,8 @@
   text-transform: uppercase;
 }
 
-.found-row {
+.history-row {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
   gap: 8px;
   margin: 0;
@@ -103,11 +110,97 @@
   font-weight: 600;
 }
 
-.found-domain {
+.history-kind {
+  flex: 0 0 48px;
+  color: var(--text-muted);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.history-source {
+  flex: 1;
   overflow-wrap: anywhere;
 }
 
-.found-when {
+.history-when {
   flex-shrink: 0;
   color: var(--text-muted);
+}
+
+.share-btn {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  padding: 2px 8px;
+  border: none;
+  border-radius: 999px;
+  background: var(--red);
+  color: var(--red-ink);
+  font: inherit;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.share-btn:hover {
+  filter: brightness(0.94);
+}
+
+.share-list {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.share-friend {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.share-friend + .share-friend {
+  border-top: 1px solid var(--line);
+}
+
+.share-friend:hover {
+  background: var(--chip-bg);
+}
+
+.share-name {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.share-address {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.share-hint {
+  margin-bottom: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.share-code {
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--chip-bg);
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
 }

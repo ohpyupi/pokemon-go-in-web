@@ -1,31 +1,75 @@
-/**
- * The trainer profile: what the user picks during registration in the popup.
- * The three fields together form the trainer's seed: the background derives
- * every encounter from them (dexId = f(seed, hostname)) and watches this
- * key's (dis)appearance to keep the wandering world in sync.
- */
+import { createAddress, createKeys, type KeyPair } from '@/utils/keys';
 
 export type Gender = 'boy' | 'girl';
 
-export interface TrainerProfile {
+export interface TrainerData {
   name: string;
   gender: Gender;
-  /** Epoch ms captured when the adventure began (registration time). */
   startedAt: number;
+  address: string | null;
 }
 
-/** Storage key for the profile (exported for the background's watcher). */
-export const TRAINER_KEY = 'trainer';
+type StoredTrainer = TrainerData & { keys?: KeyPair };
 
-export async function loadProfile(): Promise<TrainerProfile | null> {
-  const stored = await browser.storage.local.get(TRAINER_KEY);
-  return (stored[TRAINER_KEY] as TrainerProfile | undefined) ?? null;
+const TRAINER_KEY = 'trainer';
+
+export class TrainerRepository {
+  async get(): Promise<TrainerData | null> {
+    const stored = await this.read();
+    return stored === null ? null : publicPart(stored);
+  }
+
+  async create(data: TrainerData): Promise<void> {
+    const entry: StoredTrainer = {
+      name: data.name,
+      gender: data.gender,
+      startedAt: data.startedAt,
+      address: null,
+    };
+    await browser.storage.local.set({ [TRAINER_KEY]: entry });
+  }
+
+  remove(): Promise<void> {
+    return browser.storage.local.remove(TRAINER_KEY);
+  }
+
+  async generateKeys(): Promise<TrainerData | null> {
+    const stored = await this.read();
+    if (stored === null) return null;
+    if (stored.keys === undefined) {
+      const keys = await createKeys();
+      stored.keys = keys;
+      stored.address = await createAddress(keys.publicKey);
+      await browser.storage.local.set({ [TRAINER_KEY]: stored });
+    }
+    return publicPart(stored);
+  }
+
+  /** The stored pair. Background only — it must never ride a message. */
+  async getKeys(): Promise<KeyPair | null> {
+    const stored = await this.read();
+    return stored?.keys ?? null;
+  }
+
+  async removeKeys(): Promise<TrainerData | null> {
+    const stored = await this.read();
+    if (stored === null) return null;
+    delete stored.keys;
+    stored.address = null;
+    await browser.storage.local.set({ [TRAINER_KEY]: stored });
+    return publicPart(stored);
+  }
+
+  private async read(): Promise<StoredTrainer | null> {
+    const stored = await browser.storage.local.get(TRAINER_KEY);
+    return (stored[TRAINER_KEY] as StoredTrainer | undefined) ?? null;
+  }
 }
 
-export async function saveProfile(profile: TrainerProfile): Promise<void> {
-  await browser.storage.local.set({ [TRAINER_KEY]: profile });
-}
+export const trainer = new TrainerRepository();
 
-export async function clearProfile(): Promise<void> {
-  await browser.storage.local.remove(TRAINER_KEY);
+/** The half that may travel: everything but the key pair. */
+function publicPart(stored: StoredTrainer): TrainerData {
+  const { name, gender, startedAt, address } = stored;
+  return { name, gender, startedAt, address };
 }

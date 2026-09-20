@@ -1,4 +1,4 @@
-import type { TrainerProfile } from '@/model/trainer';
+import type { TrainerData } from '@/model/trainer';
 import './Trainer.css';
 
 /** The Trainer page: the profile card and the "New game" reset. */
@@ -6,7 +6,7 @@ export function Trainer({
   profile,
   onReset,
 }: {
-  profile: TrainerProfile;
+  profile: TrainerData;
   onReset: () => void;
 }) {
   return (

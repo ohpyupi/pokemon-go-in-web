@@ -12,7 +12,7 @@
  */
 import { isIP } from 'is-ip';
 import { getDomain } from 'tldts';
-import type { TrainerProfile } from '@/model/trainer';
+import type { TrainerData } from '@/model/trainer';
 
 export const GEN1_COUNT = 151;
 
@@ -27,7 +27,7 @@ function hashString(input: string): number {
 }
 
 /** Gen-1 dex id (1–151) for a trainer × page domain. */
-export function dexIdFrom(profile: TrainerProfile, domain: string): number {
+export function dexIdFrom(profile: TrainerData, domain: string): number {
   const seed = `${profile.name}|${profile.gender}|${profile.startedAt}|${domain}`;
   return (hashString(seed) % GEN1_COUNT) + 1;
 }

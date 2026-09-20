@@ -11,8 +11,9 @@
  * change — together.
  */
 
-import type { Discovery } from '@/model/db';
 import type { PokedexRow } from '@/model/pokedex';
+import type { TrainerData } from '@/model/trainer';
+import type { Acquisition, Friend } from '@/model/types';
 
 /** One answered message: what the sender sends, and the typed reply. */
 type RequestRow<Request, Reply> = { request: Request; reply: Reply };
@@ -20,20 +21,33 @@ type RequestRow<Request, Reply> = { request: Request; reply: Reply };
 /** Answered requests, grouped by who receives and answers them. */
 type RequestProtocol = {
   background: {
-    // popup: the whole index — all 151 species + met state. Light by
-    // design: a species' discovery history rides its own message below.
+    // popup: the whole index — all 151 species + indexed state. Light by
+    // design: a species' rows ride their own message below.
     'get-pokedex-data': RequestRow<{}, { rows: PokedexRow[] }>;
-    // popup: one species' discovery history — every domain it was found
-    // on, oldest first. The entry page fetches it lazily when opened.
-    'get-discoveries': RequestRow<
+    // popup: one species' acquisition rows, oldest first. The entry page
+    // fetches them lazily when opened.
+    'get-acquisitions': RequestRow<
       { dexId: number },
-      { discoveries: Discovery[] }
+      { acquisitions: Acquisition[] }
     >;
     // content script: which page is the player on right now?
     'get-encounter': RequestRow<
       { hostname: string },
       { dexId: number | null } // or null when there is no encounter on that page
     >;
+    'get-profile': RequestRow<{}, { profile: TrainerData | null }>;
+    'register-trainer': RequestRow<TrainerData, {}>;
+    'reset-trainer': RequestRow<{}, {}>;
+    'generate-address': RequestRow<{}, {}>;
+    'remove-address': RequestRow<{}, {}>;
+    'get-friends': RequestRow<{}, { friends: Friend[] }>;
+    'add-friend': RequestRow<{ address: string; nickname: string }, {}>;
+    'remove-friend': RequestRow<{ address: string }, {}>;
+    'create-share-code': RequestRow<
+      { address: string; dexId: number },
+      { code: string | null }
+    >;
+    'open-share-code': RequestRow<{ code: string }, { dexId: number | null }>;
   };
   content: {
     // future: the background asks a content script, the content answers
@@ -47,10 +61,15 @@ type EventProtocol = {
     destroy: {}; // profile erased: remove the sprite
   };
   popup: {
-    // a species' very first find: the popup lights its cell instead of
-    // refetching. A known species found on a new domain only changes its
-    // entry page, which fetches on open — no broadcast needed.
+    // a species' very first row: the popup lights its cell instead of
+    // refetching. A species that already has rows gaining one more only
+    // changes its entry page, which fetches on open — no broadcast needed.
     'pokedex-entry-added': { dexId: number };
+    'profile-changed': { profile: TrainerData | null };
+    'friend-changed':
+      | { op: 'add'; friend: Friend }
+      | { op: 'update'; friend: Friend }
+      | { op: 'remove'; address: string };
   };
 };
 
@@ -83,7 +102,17 @@ export function isBackgroundMessage(
     message,
     'get-encounter',
     'get-pokedex-data',
-    'get-discoveries',
+    'get-acquisitions',
+    'get-profile',
+    'register-trainer',
+    'reset-trainer',
+    'generate-address',
+    'remove-address',
+    'get-friends',
+    'add-friend',
+    'remove-friend',
+    'create-share-code',
+    'open-share-code',
   );
 }
 
@@ -94,7 +123,12 @@ export function isContentMessage(message: unknown): message is ContentMessage {
 
 /** True when `message` is one the popup must handle. */
 export function isPopupMessage(message: unknown): message is PopupMessage {
-  return isOneOf(message, 'pokedex-entry-added');
+  return isOneOf(
+    message,
+    'pokedex-entry-added',
+    'profile-changed',
+    'friend-changed',
+  );
 }
 
 /** Send a request to the background, get its typed reply. The one cast in

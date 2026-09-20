@@ -6,7 +6,7 @@
  * Regenerate with: npm run seed:species
  */
 
-import type { Pokemon } from '../db';
+import type { Pokemon } from '../types';
 
 /** All 151 Gen-1 species in dex order — the seed for the pokemon table. */
 export const SPECIES: readonly Pokemon[] = [

@@ -3,12 +3,13 @@
  *
  * One Dexie class over one IndexedDB database ('dex'), holding every table:
  *
- *   pokemon     — the species catalog: all 151 Gen-1 rows, seeded once when
- *                 the database is first created (see populate below). Pure
- *                 static data; never changes after seed.
- *   discoveries — the wild log: one row per species × domain where it was
- *                 found, holding when and where. Kept to the 10 oldest per
- *                 species (see model/discoveries.ts); wiped on "New game".
+ *   pokemon      — the species catalog: all 151 Gen-1 rows, seeded once when
+ *                  the database is first created (see populate below). Pure
+ *                  static data; never changes after seed.
+ *   acquisitions — the log of how each entry was gained: found in the wild,
+ *                  or shared by a friend. One row per Pokémon × source;
+ *                  wiped on "New game".
+ *   discoveries  — TODO: drop in v3. Read only by the v2 migration.
  *
  * Schema grows in the constructor: each `version()` adds a migration.
  * Background-only: Dexie must never be bundled into the popup or content
@@ -19,56 +20,13 @@
 
 import Dexie, { type Table } from 'dexie';
 import { SPECIES } from './seed/species';
-
-/** The modern type set — the 18 slugs PokeAPI / Pokémon GO use today,
- *  lowercase (e.g. 'grass', 'fire'). */
-export type PokemonType =
-  | 'normal'
-  | 'fire'
-  | 'water'
-  | 'electric'
-  | 'grass'
-  | 'ice'
-  | 'fighting'
-  | 'poison'
-  | 'ground'
-  | 'flying'
-  | 'psychic'
-  | 'bug'
-  | 'rock'
-  | 'ghost'
-  | 'dragon'
-  | 'dark'
-  | 'steel'
-  | 'fairy';
-
-/** A species-catalog row. All static data comes with the seed (fetched
- *  from PokeAPI): the first English flavor text as the description, the
- *  modern type set (current games / Pokémon GO, not Gen-1 originals) and
- *  the size in PokeAPI raw units. */
-export interface Pokemon {
-  dexId: number;
-  name: string;
-  description: string;
-  /** Modern type slugs, primary first (e.g. ['grass', 'poison']). */
-  types: PokemonType[];
-  /** Height in decimeters. */
-  height: number;
-  /** Weight in hectograms. */
-  weight: number;
-}
-
-/** A discovery row: the species was found on the domain `foundOn` at
- *  `foundAt`. One row per species × domain — [dexId + foundOn] is the key,
- *  so each site is recorded once; revisits change nothing. */
-export interface Discovery {
-  dexId: number;
-  foundOn: string;
-  foundAt: number;
-}
+import type { Acquisition, Discovery, Friend, Pokemon } from './types';
 
 class DexDB extends Dexie {
   pokemon!: Table<Pokemon, number>;
+  acquisitions!: Table<Acquisition, string>;
+  friends!: Table<Friend, string>;
+  /** @deprecated TODO: drop in v3 — read `acquisitions` instead. */
   discoveries!: Table<Discovery, [number, string]>;
 
   constructor() {
@@ -81,6 +39,41 @@ class DexDB extends Dexie {
       // memory — no timeline index needed.
       discoveries: '[dexId+foundOn], dexId',
     });
+    // v2 — the acquisition log, replacing the wild-only log.
+    //
+    // A table left out of a version's stores keeps its earlier schema (only
+    // `null` drops one) — but an index you do not restate IS dropped, so a
+    // later version of `acquisitions` must repeat both &[...] below.
+    //
+    // Those two unique indexes are the dedup rule: one row per Pokémon ×
+    // source. A 'found' row has no `sharedBy`, and IndexedDB skips a row
+    // whose indexed value is missing, so each index constrains only its own
+    // kind — a site name may equal a friend's name. Verified in Chrome.
+    //
+    // TODO: drop `discoveries` in v3 — v2 only copies from it.
+    this.version(2)
+      .stores({
+        acquisitions:
+          'id, dexId, kind, foundOn, sharedBy, &[dexId+foundOn], &[dexId+sharedBy]',
+        friends: 'address, addedAt',
+      })
+      .upgrade(async (tx) => {
+        // Every old row is a wild find, so the copy is a straight rename.
+        const old = await tx
+          .table<Discovery, [number, string]>('discoveries')
+          .toArray();
+        await Promise.all(
+          old.map((row) =>
+            tx.table<Acquisition, string>('acquisitions').add({
+              id: crypto.randomUUID(),
+              dexId: row.dexId,
+              kind: 'found',
+              foundOn: row.foundOn,
+              acquiredAt: row.foundAt,
+            }),
+          ),
+        );
+      });
     // Runs exactly once, inside the transaction that creates the database:
     // pour the catalog in. (A version bump later re-runs nothing here.)
     this.on('populate', (tx) => {
