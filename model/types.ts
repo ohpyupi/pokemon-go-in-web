@@ -67,3 +67,10 @@ export interface SharedAcquisition extends AcquisitionBase {
 }
 
 export type Acquisition = FoundAcquisition | SharedAcquisition;
+
+/** A friend added by their wallet address; the nickname is only the local
+ *  label for that string. */
+export interface Friend {
+  address: string;
+  nickname: string;
+}
