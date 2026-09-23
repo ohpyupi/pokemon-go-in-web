@@ -37,7 +37,6 @@ export function Registration({
         name: trimmed,
         gender,
         startedAt: Date.now(),
-        address: null,
       });
     } catch {
       setError('Could not save your trainer. Please try again.');
