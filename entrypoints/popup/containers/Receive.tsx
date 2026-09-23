@@ -4,7 +4,7 @@ import './Receive.css';
 
 type OpenResult = { kind: 'ok'; dexId: number } | { kind: 'failed' };
 
-export function Receive({ address }: { address: string | null }) {
+export function Receive({ address }: { address?: string }) {
   const [code, setCode] = useState('');
   const [result, setResult] = useState<OpenResult | null>(null);
   const [copied, setCopied] = useState(false);
@@ -14,7 +14,7 @@ export function Receive({ address }: { address: string | null }) {
   };
 
   const copyAddress = async (): Promise<void> => {
-    if (address === null) return;
+    if (!address) return;
     await navigator.clipboard.writeText(address);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
@@ -38,7 +38,7 @@ export function Receive({ address }: { address: string | null }) {
       <h1 className="title">Receive a Pokémon</h1>
       <div className="my-address">
         <p className="receive-title">My address</p>
-        {address === null ? (
+        {!address ? (
           <>
             <p className="receive-hint">
               Generate a new address, and share it with your friends to receive
@@ -69,7 +69,7 @@ export function Receive({ address }: { address: string | null }) {
           </>
         )}
       </div>
-      {address !== null && (
+      {!!address && (
         <>
           <input
             className="input"

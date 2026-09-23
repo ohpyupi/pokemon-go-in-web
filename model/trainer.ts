@@ -6,7 +6,7 @@ export interface TrainerData {
   name: string;
   gender: Gender;
   startedAt: number;
-  address: string | null;
+  address?: string;
 }
 
 type StoredTrainer = TrainerData & { keys?: KeyPair };
@@ -24,7 +24,6 @@ export class TrainerRepository {
       name: data.name,
       gender: data.gender,
       startedAt: data.startedAt,
-      address: null,
     };
     await browser.storage.local.set({ [TRAINER_KEY]: entry });
   }
@@ -55,7 +54,7 @@ export class TrainerRepository {
     const stored = await this.read();
     if (stored === null) return null;
     delete stored.keys;
-    stored.address = null;
+    delete stored.address;
     await browser.storage.local.set({ [TRAINER_KEY]: stored });
     return publicPart(stored);
   }
